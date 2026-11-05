@@ -28,15 +28,24 @@ body {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  transition: opacity 0.75s ease;
+  transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #splash.splash-out {
   opacity: 0;
+}
+#splash.splash-text-out .splash-line {
+  opacity: 0;
+  filter: blur(4px);
+  transform: scale(0.985);
 }
 .splash-line {
   position: relative;
   display: inline-block;
   white-space: pre;
+  transition:
+    opacity 0.45s ease,
+    filter 0.45s ease,
+    transform 0.45s ease;
 }
 .splash-ghost {
   visibility: hidden;
@@ -46,22 +55,6 @@ body {
   left: 0;
   top: 0;
   white-space: pre;
-}
-.splash-caret {
-  display: inline-block;
-  width: 2px;
-  height: 1.1em;
-  margin-left: 3px;
-  background: currentColor;
-  transform: translateY(1px);
-}
-#splash.splash-done .splash-caret {
-  animation: splash-blink 0.5s steps(1) infinite;
-}
-@keyframes splash-blink {
-  50% {
-    opacity: 0;
-  }
 }
 
 .scrollbar-hidden {

@@ -45,6 +45,18 @@ function Artwork({ dimmed, art, coverOnMobile = false }: { dimmed: boolean; art:
       if (el.naturalWidth === 0) setFailed(true);
       else setAspect(el.naturalWidth / el.naturalHeight);
     }
+    // If the first-open splash is still up, wait and come into focus as it fades.
+    const w = window as Window & { __splashRevealed?: boolean };
+    const splash = document.getElementById("splash");
+    if (splash && splash.style.display === "flex" && !w.__splashRevealed) {
+      const reveal = () => setRevealed(true);
+      window.addEventListener("splash:reveal", reveal, { once: true });
+      const fallback = setTimeout(reveal, 6000);
+      return () => {
+        window.removeEventListener("splash:reveal", reveal);
+        clearTimeout(fallback);
+      };
+    }
     const t = requestAnimationFrame(() => setRevealed(true));
     return () => cancelAnimationFrame(t);
   }, []);
@@ -84,7 +96,7 @@ function Artwork({ dimmed, art, coverOnMobile = false }: { dimmed: boolean; art:
       className="fixed inset-0 overflow-hidden bg-black"
       style={{
         filter: dimmed ? "blur(10px) brightness(0.55)" : revealed ? "blur(0px)" : "blur(25px)",
-        transition: "filter 1s cubic-bezier(.165,.84,.44,1)",
+        transition: "filter 1.3s cubic-bezier(.165,.84,.44,1)",
       }}
     >
       {!failed && (

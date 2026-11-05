@@ -24,10 +24,16 @@ export function Splash() {
   el.style.display = "flex";
   var name = ${JSON.stringify(site.name)};
   var text = document.getElementById("splash-text");
+  // Staged exit: hold, fade the name, then fade the white while the artwork
+  // behind it starts to come into focus (it listens for "splash:reveal").
   var done = function () {
-    el.classList.add("splash-done");
-    setTimeout(function () { el.classList.add("splash-out"); }, 520);
-    setTimeout(function () { el.remove(); }, 1300);
+    setTimeout(function () { el.classList.add("splash-text-out"); }, 450);
+    setTimeout(function () {
+      el.classList.add("splash-out");
+      window.__splashRevealed = true;
+      window.dispatchEvent(new Event("splash:reveal"));
+    }, 750);
+    setTimeout(function () { el.remove(); }, 2000);
   };
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     text.textContent = name;
@@ -49,7 +55,7 @@ export function Splash() {
     // fixed left edge instead of re-centring on every keystroke.
     '<div id="splash" aria-hidden="true"><span class="splash-line"><span class="splash-ghost">' +
     site.name.replace(/&/g, "&amp;").replace(/</g, "&lt;") +
-    '</span><span class="splash-typed"><span id="splash-text"></span><span class="splash-caret"></span></span></span></div>' +
+    '</span><span class="splash-typed"><span id="splash-text"></span></span></span></div>' +
     `<script>${script}</script>`;
 
   // Rendered as raw HTML so the inline script runs during parsing and React
