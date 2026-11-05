@@ -12,8 +12,8 @@ export const site = {
 
   links: {
     github: "https://github.com/akhileshpantulu",
-    linkedin: "https://www.linkedin.com/in/akhileshpantulu", // TODO: confirm handle
-    email: "hello@example.com", // TODO: public contact email
+    linkedin: "https://www.linkedin.com/in/pantulu",
+    email: "pantuluinvestments@gmail.com",
     // Put your resume PDF in /public and set the path here, or leave null to hide it.
     resume: null as string | null, // e.g. "/Akhilesh-Pantulu-Resume.pdf"
   },
