@@ -65,8 +65,7 @@ export const rooms: Room[] = [
     // Homepage artwork (public/Bradford.jpg). Image rooms are shown whole,
     // never cropped. If the file is missing, the house illustration shows instead.
     image: "/Bradford.jpg",
-    // TODO: fill in the artwork credit, e.g.
-    // credit: { title: "", artist: "", year: "", museum: "The Museum of Modern Art, New York" },
+    credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" },
     beacons: [],
   },
   {
