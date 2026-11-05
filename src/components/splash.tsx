@@ -20,6 +20,8 @@ export function Splash() {
     seen = Date.now() - last < 12 * 60 * 60 * 1000;
     if (!seen) localStorage.setItem("splash-seen", String(Date.now()));
   } catch (e) {}
+  // Add ?splash to the address to force it to play (handy for previewing).
+  if (/[?&]splash\b/.test(location.search)) seen = false;
   if (seen) { el.remove(); return; }
   el.style.display = "flex";
   var name = ${JSON.stringify(site.name)};
