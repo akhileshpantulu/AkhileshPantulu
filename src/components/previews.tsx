@@ -77,18 +77,6 @@ function Bar({ pct, color, inView, delay }: { pct: number; color: string; inView
   );
 }
 
-/** Panel wrapper used by flagship cards (dark inset box with a header). */
-export function PreviewPanel({ preview }: { preview: Preview }) {
-  return (
-    <div
-      className="relative rounded-xl border border-border-subtle p-5 transition-colors duration-300 group-hover:border-accent-border/60 sm:p-6"
-      style={{ background: "rgba(0,0,0,0.42)" }}
-    >
-      <PreviewChart preview={preview} withHeader />
-    </div>
-  );
-}
-
 export function PreviewChart({ preview, withHeader = false }: { preview: Preview; withHeader?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });

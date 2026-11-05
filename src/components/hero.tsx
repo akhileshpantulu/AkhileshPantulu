@@ -12,7 +12,6 @@ export function Hero() {
       <h1 className="text-[clamp(52px,9vw,112px)] font-medium leading-[0.95] tracking-[-0.035em] text-fg-bright">
         {site.name}
       </h1>
-      <div className="mt-4 font-mono text-[13px] tracking-[0.16em] text-accent">{site.tagline}</div>
       <p className="mt-7 max-w-2xl text-[19px] leading-[1.55] text-fg/85">{site.intro}</p>
       <div className="mt-6 flex items-center gap-2.5">
         <a href={links.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub" className={`${pill} w-10`}>

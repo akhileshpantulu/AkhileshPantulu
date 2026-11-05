@@ -9,8 +9,6 @@ import type { Preview } from "@/components/previews";
 
 export const site = {
   name: "Akhilesh Pantulu",
-  // Short tagline shown in the header, hero, and page title.
-  tagline: "DATA · AI · ML",
   // TODO: one-sentence intro under your name.
   intro: "Building data products, models, and tools that make decisions easier.",
   url: "https://akhileshpantulu.com", // TODO: your domain
@@ -29,65 +27,7 @@ export const site = {
 };
 
 /* ------------------------------------------------------------------ */
-/* 01 · Flagship work: live products, shown as large cards.            */
-/* ------------------------------------------------------------------ */
-
-export type Flagship = {
-  title: string;
-  category: string; // small caps label above the title
-  description: string;
-  url: string;
-  status?: string; // pill text, default "Flagship — Live"
-  stack: string[];
-  preview: Preview;
-};
-
-export const flagships: Flagship[] = [
-  {
-    // TODO: replace with a real project
-    title: "Flagship Project One",
-    category: "Domain · Product Type",
-    description:
-      "Describe what the product does, who it is for, and what makes it work. Mention the data it runs on, the pipeline behind it, and the result someone gets when they use it.",
-    url: "https://example.com",
-    stack: ["Python", "SQL", "next.js", "PostgreSQL"],
-    preview: {
-      kind: "leaderboard",
-      title: "Leaderboard — 2026",
-      rows: [
-        { label: "Entry Alpha", tag: "AAA", value: 92.4 },
-        { label: "Entry Bravo", tag: "BBB", value: 88.1 },
-        { label: "Entry Charlie", tag: "CCC", value: 84.7 },
-        { label: "Entry Delta", tag: "DDD", value: 79.3 },
-      ],
-    },
-  },
-  {
-    // TODO: replace with a real project
-    title: "Flagship Project Two",
-    category: "Model · Evaluation",
-    description:
-      "A second live product. Lead with the problem, then the approach, then one measurable result backed by an evaluation you can reproduce.",
-    url: "https://example.com",
-    stack: ["Python", "FastAPI", "Claude API", "SQLite"],
-    preview: {
-      kind: "bars",
-      title: "Error Rate",
-      rows: [
-        { label: "Baseline", value: 100, suffix: "%", tone: "bad" },
-        { label: "This model", value: 41, suffix: "%", tone: "accent" },
-        { label: "False alarms", value: 3, suffix: "%", tone: "good" },
-      ],
-      footer: [
-        { label: "Calibration", value: "0.44 → 0.15" },
-        { label: "Accuracy", value: "86.2%" },
-      ],
-    },
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/* 02 · Projects / articles. Each one gets its own page at             */
+/* 01 · Projects / articles. Each one gets its own page at             */
 /* /articles/<slug>. The first `projectsVisible` are shown; the rest   */
 /* sit behind a "View N more" button.                                  */
 /* ------------------------------------------------------------------ */
@@ -205,7 +145,7 @@ export const projects: Project[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* 03 · Tech stack. Icons are draggable in a little physics box.       */
+/* 02 · Tech stack. Icons are draggable in a little physics box.       */
 /* `icon` keys map to components in src/components/tech-icons.tsx.     */
 /* ------------------------------------------------------------------ */
 
@@ -229,7 +169,7 @@ export const tech: { name: string; icon: string; color: string }[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* 04 · About                                                          */
+/* 03 · About                                                          */
 /* ------------------------------------------------------------------ */
 
 export const about = {
@@ -248,7 +188,7 @@ export const about = {
 };
 
 /* ------------------------------------------------------------------ */
-/* 05 · Contact                                                        */
+/* 04 · Contact                                                        */
 /* ------------------------------------------------------------------ */
 
 export const contact = {
@@ -259,7 +199,6 @@ export const contact = {
 
 /* Navigation. Order and labels for the header; ids must match sections. */
 export const nav = [
-  { id: "work", label: "flagship" },
   { id: "projects", label: "projects" },
   { id: "tech", label: "tech" },
   { id: "about", label: "about" },

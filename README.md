@@ -16,16 +16,15 @@ All copy, projects, and links live in **`src/content/site.ts`**. Anything marked
 
 | Section | What to edit in `site.ts` |
 | --- | --- |
-| Header / hero | `site` (name, tagline, intro, links, resume path) |
-| 01 Selected work | `flagships`: live products shown as large cards |
-| 02 Projects | `projects`: each one also gets a page at `/articles/<slug>` |
-| 03 Tech | `tech`: icon keys map to `src/components/tech-icons.tsx` |
-| 04 About | `about` |
-| 05 Contact | `contact` |
+| Header / hero | `site` (name, intro, links, resume path) |
+| 01 Projects | `projects`: each one also gets a page at `/articles/<slug>` |
+| 02 Tech | `tech`: icon keys map to `src/components/tech-icons.tsx` |
+| 03 About | `about` |
+| 04 Contact | `contact` |
 
 **Resume:** drop a PDF in `public/` and set `site.links.resume` to its path, e.g. `"/Akhilesh-Pantulu-Resume.pdf"`. The resume buttons stay hidden while it's `null`.
 
-**Card charts:** each flagship and project has a `preview` with one of five `kind`s, all animated on scroll:
+**Card charts:** each project has a `preview` with one of five `kind`s, all animated on scroll:
 
 - `leaderboard`: ranked rows with scores and bars
 - `bars`: labeled metric bars with an optional footer

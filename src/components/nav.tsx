@@ -61,8 +61,6 @@ export function Nav({ home = false }: { home?: boolean }) {
         >
           <PulseDot />
           <span>{site.name.toUpperCase()}</span>
-          <span className="hidden text-fg-dim sm:inline">/</span>
-          <span className="hidden text-fg-muted sm:inline">{site.tagline}</span>
         </a>
         <nav className="hidden items-center gap-8 md:flex">
           {nav.map((item, i) => {

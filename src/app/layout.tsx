@@ -4,7 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import { site } from "@/content/site";
 import "./globals.css";
 
-const title = `${site.name} — ${site.tagline}`;
+const title = site.name;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
