@@ -284,20 +284,11 @@ function LinksList({ open, links, className, from }: { open: boolean; links: Rea
 function AboutText() {
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-2xl font-bold leading-tight">{about.greeting}</p>
       {about.paragraphs.map((p) => (
-        <p key={p} className="leading-relaxed text-white/80">
+        <p key={p} className="text-xl leading-relaxed text-white/90">
           {p}
         </p>
       ))}
-      <dl className="mt-3 divide-y divide-white/15 border-y border-white/15">
-        {about.facts.map((f) => (
-          <div key={f.label} className="grid grid-cols-[100px_1fr] gap-4 py-3 text-sm">
-            <dt className="font-semibold text-white/50">{f.label}</dt>
-            <dd className="text-white/90">{f.value}</dd>
-          </div>
-        ))}
-      </dl>
     </div>
   );
 }
@@ -467,10 +458,6 @@ export function Experience({ page }: { page?: Page }) {
             Contact
           </button>
         </div>
-        {/* desktop corners */}
-        <button type="button" className={`${btn} pointer-events-auto fixed bottom-6 right-6 hidden md:block`} aria-expanded={menu === "links"} aria-label="Links" onClick={() => toggle("links")}>
-          ®
-        </button>
 
         {/* mobile */}
         <h1 className="pointer-events-auto fixed left-1/2 top-10 -translate-x-1/2 whitespace-nowrap font-bold md:hidden [@media(max-height:500px)]:top-3">
@@ -514,9 +501,9 @@ export function Experience({ page }: { page?: Page }) {
         </div>
       </div>
 
-      {/* Contact links: top-right dropdown (Contact) and bottom-right (® / phone Contact) */}
+      {/* Contact links: top-right dropdown on desktop, above the Contact button on phones */}
       <LinksList open={menu === "contact"} links={links} className="right-6 top-[60px] hidden md:block" from="above" />
-      <LinksList open={menu === "links"} links={links} className="bottom-16 right-6" from="below" />
+      <LinksList open={menu === "links"} links={links} className="bottom-16 right-6 md:hidden" from="below" />
 
       {/* Right drawer */}
       <aside

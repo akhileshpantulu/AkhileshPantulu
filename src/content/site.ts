@@ -115,19 +115,11 @@ export const projects: Project[] = [
 /* ------------------------------------------------------------------ */
 
 export const about = {
-  greeting: "Hi, I’m Akhilesh.",
-  // TODO: two short paragraphs about what you do.
   paragraphs: [
-    "Write a sentence or two about your current role and the kind of problems you work on.",
-    "Then a sentence about the stack you use and what you build outside of work.",
-  ],
-  facts: [
-    { label: "Education", value: "TODO: Degree, School (Year)" },
-    { label: "Based", value: "TODO: City, State" },
-    { label: "Focus", value: "Analytics · Data Science · ML" },
-    { label: "Stack", value: "Python · SQL · TypeScript" },
+    "I’m an investment professional based in London. This website serves as a collection of my more esoteric interests, and AI application projects.",
   ],
 };
+
 
 /* Books: shown in About → Books. TODO: replace with your own. */
 export const books: { title: string; author: string; note?: string; url?: string }[] = [
