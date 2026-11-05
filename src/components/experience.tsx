@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { about, books, home, misc, pageArt, projects, site, type Credit } from "@/content/site";
+import { about, books, gallery, home, misc, pageArt, projects, site, type Credit } from "@/content/site";
 import { longDate } from "./format";
 
 type Menu = null | "projects" | "about" | "contact" | "links" | "mobile";
 type Drawer = null | { kind: "misc" } | { kind: "project"; slug: string };
-type Page = "about" | "books";
+type Page = "about" | "books" | "art";
+type TextPage = "about" | "books";
 type Art = { image: string; credit: Credit | null };
 
 const DEFAULT_ASPECT = 16 / 9;
@@ -316,7 +317,7 @@ function BooksText() {
 }
 
 /** Dark, blurred strip over the artwork. "Hide" tucks it away to show the whole piece. */
-function TextPanel({ page, faded, hidden, setHidden }: { page: Page; faded: boolean; hidden: boolean; setHidden: (h: boolean) => void }) {
+function TextPanel({ page, faded, hidden, setHidden }: { page: TextPage; faded: boolean; hidden: boolean; setHidden: (h: boolean) => void }) {
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setEntered(true), 350);
@@ -365,7 +366,14 @@ function TextPanel({ page, faded, hidden, setHidden }: { page: Page; faded: bool
 /* ----------------------------------------------------------------- */
 
 export function Experience({ page }: { page?: Page }) {
-  const art: Art = page && pageArt[page].image ? { image: pageArt[page].image!, credit: pageArt[page].credit ?? null } : home;
+  const textPage: TextPage | undefined = page === "about" || page === "books" ? page : undefined;
+  const [idx, setIdx] = useState(0);
+  const isGallery = page === "art" && gallery.length > 0;
+  const art: Art = isGallery
+    ? gallery[idx]
+    : textPage && pageArt[textPage].image
+      ? { image: pageArt[textPage].image!, credit: pageArt[textPage].credit ?? null }
+      : home;
   const [menu, setMenu] = useState<Menu>(null);
   const [textHidden, setTextHidden] = useState(false);
   const [drawer, setDrawer] = useState<Drawer>(null);
@@ -403,6 +411,9 @@ export function Experience({ page }: { page?: Page }) {
     <Link key="books" href="/books/" onClick={closeAll} className={`hover:opacity-50 ${page === "books" ? "underline underline-offset-4" : ""}`}>
       Books
     </Link>,
+    <Link key="art" href="/art/" onClick={closeAll} className={`hover:opacity-50 ${page === "art" ? "underline underline-offset-4" : ""}`}>
+      Art
+    </Link>,
     <button key="misc" type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: "misc" })}>
       Misc
     </button>,
@@ -414,21 +425,75 @@ export function Experience({ page }: { page?: Page }) {
   ));
 
   const anyOpen = menu !== null || drawer !== null;
+
+  // Gallery: flip with arrow keys and swipes; preload the neighbours.
+  const step = useCallback((d: number) => setIdx((i) => (i + d + gallery.length) % gallery.length), []);
+  const canFlip = isGallery && gallery.length > 1;
+  useEffect(() => {
+    if (!canFlip || anyOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    let x0: number | null = null;
+    const onStart = (e: TouchEvent) => (x0 = e.touches[0].clientX);
+    const onEnd = (e: TouchEvent) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+      x0 = null;
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchend", onEnd);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, [canFlip, anyOpen, step]);
+  useEffect(() => {
+    if (!canFlip) return;
+    for (const d of [1, -1]) new Image().src = gallery[(idx + d + gallery.length) % gallery.length].image;
+  }, [canFlip, idx]);
   const btn = "px-2.5 text-base font-semibold transition-opacity duration-300 hover:opacity-60";
   const shown = drawer ?? lastDrawer;
 
   return (
     <>
       <Loader />
-      <Artwork dimmed={anyOpen} art={art} coverOnMobile={!!page && !textHidden} />
-      {page && <TextPanel key={page} page={page} faded={anyOpen} hidden={textHidden} setHidden={setTextHidden} />}
+      <Artwork key={art.image} dimmed={anyOpen} art={art} coverOnMobile={!!textPage && !textHidden} />
+      {textPage && <TextPanel key={textPage} page={textPage} faded={anyOpen} hidden={textHidden} setHidden={setTextHidden} />}
+
+      {/* Gallery controls: corners on desktop, beside the credit on phones */}
+      {canFlip && !anyOpen && (
+        <>
+          <button type="button" onClick={() => step(-1)} className="fixed bottom-6 left-6 z-40 hidden px-2.5 text-base font-semibold text-white transition-opacity hover:opacity-60 md:block">
+            Previous
+          </button>
+          <button type="button" onClick={() => step(1)} className="fixed bottom-6 right-6 z-40 hidden px-2.5 text-base font-semibold text-white transition-opacity hover:opacity-60 md:block">
+            Next
+          </button>
+          <button type="button" aria-label="Previous" onClick={() => step(-1)} className="fixed bottom-[70px] left-6 z-40 h-8 w-8 border border-neutral-300 bg-black/40 font-bold text-neutral-200 backdrop-blur md:hidden [@media(max-height:500px)]:hidden">
+            ←
+          </button>
+          <button type="button" aria-label="Next" onClick={() => step(1)} className="fixed bottom-[70px] right-6 z-40 h-8 w-8 border border-neutral-300 bg-black/40 font-bold text-neutral-200 backdrop-blur md:hidden [@media(max-height:500px)]:hidden">
+            →
+          </button>
+        </>
+      )}
 
       {/* click-away layer */}
       {anyOpen && <button type="button" aria-label="Close" className="fixed inset-0 z-30 cursor-default" onClick={closeAll} />}
 
       {/* Credit tag for the artwork */}
       {art.credit && (
-        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 transition-opacity duration-300 [text-shadow:0_0_8px_rgba(0,0,0,0.95)] md:bottom-7" style={{ opacity: anyOpen ? 0 : 1, visibility: anyOpen ? "hidden" : "visible" }}>
+        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-112px)] md:max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 transition-opacity duration-300 [text-shadow:0_0_8px_rgba(0,0,0,0.95)] md:bottom-7" style={{ opacity: anyOpen ? 0 : 1, visibility: anyOpen ? "hidden" : "visible" }}>
+          {isGallery && gallery.length > 1 && (
+            <span className="mr-1.5 tabular-nums text-white/55">
+              {idx + 1} / {gallery.length} ·
+            </span>
+          )}
           {art.credit.url ? (
             <a href={art.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
               <CreditText c={art.credit} />

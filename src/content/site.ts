@@ -31,6 +31,12 @@ export const home: { image: string; credit: Credit | null } = {
   credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" },
 };
 
+/* Art gallery (/art). Shown one at a time, in this order. To add a piece,
+   put the image in /public and add an entry with its credit. */
+export const gallery: { image: string; credit: Credit | null }[] = [
+  { image: "/Bradford.jpg", credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" } },
+];
+
 /* Artwork for the About and Books pages, shown full-screen with the text
    over it. Leave a page empty to reuse the homepage artwork. TODO: pick art. */
 export const pageArt: Record<"about" | "books", { image?: string; credit?: Credit | null }> = {
