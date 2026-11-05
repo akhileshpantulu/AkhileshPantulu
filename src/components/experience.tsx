@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { about, books, home, misc, projects, site, type Credit, type Panel } from "@/content/site";
+import { about, books, home, misc, pageArt, projects, site, type Credit } from "@/content/site";
 import { longDate } from "./format";
 
 type Menu = null | "projects" | "about" | "contact" | "links" | "mobile";
-type Drawer = null | { kind: Panel } | { kind: "project"; slug: string };
+type Drawer = null | { kind: "misc" } | { kind: "project"; slug: string };
+type Page = "about" | "books";
+type Art = { image: string; credit: Credit | null };
 
 const DEFAULT_ASPECT = 16 / 9;
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -50,7 +52,7 @@ function Loader() {
 /* Artwork: the homepage image, fit whole inside the screen           */
 /* ----------------------------------------------------------------- */
 
-function Artwork({ dimmed }: { dimmed: boolean }) {
+function Artwork({ dimmed, art, coverOnMobile = false }: { dimmed: boolean; art: Art; coverOnMobile?: boolean }) {
   const img = useRef<HTMLImageElement>(null);
   const [box, setBox] = useState<{ w: number; h: number; x: number; y: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -72,8 +74,15 @@ function Artwork({ dimmed }: { dimmed: boolean }) {
     const fit = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      // Leave space for the header above and the credit / corner buttons below.
       const md = vw >= 768;
+      // On phones, pages with text over the art fill the screen behind the text.
+      if (coverOnMobile && !md) {
+        const w = Math.max(vw, vh * aspect);
+        const h = w / aspect;
+        setBox({ w, h, x: (vw - w) / 2, y: (vh - h) / 2 });
+        return;
+      }
+      // Leave space for the header above and the credit / corner buttons below.
       const short = !md && vh < 500; // phone held sideways
       const top = md ? 72 : short ? 48 : 84;
       const bottom = md ? 72 : short ? 64 : 128;
@@ -87,9 +96,9 @@ function Artwork({ dimmed }: { dimmed: boolean }) {
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
-  }, [aspect]);
+  }, [aspect, coverOnMobile]);
 
-  const alt = home.credit ? `${home.credit.title} by ${home.credit.artist}` : "";
+  const alt = art.credit ? `${art.credit.title} by ${art.credit.artist}` : "";
 
   return (
     <div
@@ -102,12 +111,16 @@ function Artwork({ dimmed }: { dimmed: boolean }) {
       {!failed && (
         <div
           className="relative"
-          style={box ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y } : { visibility: "hidden" }}
+          style={
+            box
+              ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y, transition: revealed ? "all 0.7s cubic-bezier(.165,.84,.44,1)" : undefined }
+              : { visibility: "hidden" }
+          }
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={img}
-            src={home.image}
+            src={art.image}
             alt={alt}
             onLoad={(e) => setAspect(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)}
             onError={() => setFailed(true)}
@@ -158,47 +171,6 @@ function linkItems() {
 /* ----------------------------------------------------------------- */
 
 function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; openProject: (slug: string) => void }) {
-  if (drawer.kind === "about") {
-    return (
-      <div className="flex flex-col gap-5">
-        <p className="text-xl font-bold">{about.greeting}</p>
-        {about.paragraphs.map((p) => (
-          <p key={p} className="leading-relaxed text-neutral-700">
-            {p}
-          </p>
-        ))}
-        <dl className="mt-4 divide-y divide-neutral-200 border-y border-neutral-200">
-          {about.facts.map((f) => (
-            <div key={f.label} className="grid grid-cols-[110px_1fr] gap-4 py-3 text-sm">
-              <dt className="font-semibold">{f.label}</dt>
-              <dd className="text-neutral-700">{f.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    );
-  }
-  if (drawer.kind === "books") {
-    return (
-      <ul className="flex flex-col divide-y divide-neutral-200 border-y border-neutral-200">
-        {books.map((bk) => (
-          <li key={bk.title} className="py-4">
-            <div className="text-lg font-bold leading-tight">
-              {bk.url ? (
-                <a href={bk.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-50">
-                  {bk.title}
-                </a>
-              ) : (
-                bk.title
-              )}
-            </div>
-            <div className="mt-0.5 text-sm text-neutral-500">{bk.author}</div>
-            {bk.note && <p className="mt-2 text-sm leading-relaxed text-neutral-700">{bk.note}</p>}
-          </li>
-        ))}
-      </ul>
-    );
-  }
   if (drawer.kind === "misc") {
     return (
       <ul className="flex flex-col gap-6">
@@ -259,7 +231,7 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
 }
 
 const drawerTitle = (d: Exclude<Drawer, null>) =>
-  d.kind === "about" ? "About" : d.kind === "books" ? "Books" : d.kind === "misc" ? "Misc" : "Project";
+  d.kind === "misc" ? "Misc" : "Project";
 
 function CreditText({ c }: { c: Credit }) {
   return (
@@ -293,11 +265,96 @@ function LinksList({ open, links, className, from }: { open: boolean; links: Rea
 }
 
 /* ----------------------------------------------------------------- */
+/* Text over art: About and Books pages                               */
+/* ----------------------------------------------------------------- */
+
+function AboutText() {
+  return (
+    <div className="flex flex-col gap-5">
+      <p className="text-2xl font-bold leading-tight">{about.greeting}</p>
+      {about.paragraphs.map((p) => (
+        <p key={p} className="leading-relaxed text-white/80">
+          {p}
+        </p>
+      ))}
+      <dl className="mt-3 divide-y divide-white/15 border-y border-white/15">
+        {about.facts.map((f) => (
+          <div key={f.label} className="grid grid-cols-[100px_1fr] gap-4 py-3 text-sm">
+            <dt className="font-semibold text-white/50">{f.label}</dt>
+            <dd className="text-white/90">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+function BooksText() {
+  return (
+    <ul className="flex flex-col divide-y divide-white/15">
+      {books.map((bk) => (
+        <li key={bk.title} className="py-4 first:pt-0 last:pb-0">
+          <div className="text-xl font-bold leading-tight">
+            {bk.url ? (
+              <a href={bk.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-60">
+                {bk.title}
+              </a>
+            ) : (
+              bk.title
+            )}
+          </div>
+          <div className="mt-1 text-sm text-white/55">{bk.author}</div>
+          {bk.note && <p className="mt-2 text-sm leading-relaxed text-white/80">{bk.note}</p>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Dark, blurred strip over the artwork. "Hide" tucks it away to show the whole piece. */
+function TextPanel({ page, faded, hidden, setHidden }: { page: Page; faded: boolean; hidden: boolean; setHidden: (h: boolean) => void }) {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setEntered(true), 350);
+    return () => clearTimeout(t);
+  }, []);
+  const title = page === "about" ? "About" : "Books";
+  const visible = entered && !hidden && !faded;
+  return (
+    <>
+      <section
+        aria-label={title}
+        className="fixed inset-x-4 bottom-[128px] top-[84px] z-[35] flex flex-col border border-white/10 bg-black/55 text-white backdrop-blur-xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(.165,.84,.44,1)] md:inset-x-auto md:bottom-[88px] md:left-6 md:top-[88px] md:w-[min(440px,40vw)] [@media(max-height:500px)]:bottom-[64px] [@media(max-height:500px)]:top-[48px]"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateX(-12px)", visibility: visible ? "visible" : "hidden" }}
+      >
+        <div className="flex h-14 flex-none items-center justify-between border-b border-white/15 px-6">
+          <h2 className="font-bold">{title}</h2>
+          <button type="button" className="text-sm font-semibold text-white/70 hover:text-white" onClick={() => setHidden(true)}>
+            Hide
+          </button>
+        </div>
+        <div className="scrollbar-hidden flex-1 overflow-y-auto px-6 py-6">{page === "about" ? <AboutText /> : <BooksText />}</div>
+      </section>
+      <button
+        type="button"
+        onClick={() => setHidden(false)}
+        className="fixed left-4 top-[84px] z-[35] h-8 border border-white/60 bg-black/40 px-2.5 text-sm font-bold text-white backdrop-blur transition-opacity duration-500 md:left-6 md:top-[88px] [@media(max-height:500px)]:top-[48px]"
+        style={{ opacity: hidden && !faded ? 1 : 0, visibility: hidden && !faded ? "visible" : "hidden" }}
+      >
+        Show {title}
+      </button>
+    </>
+  );
+}
+
+/* ----------------------------------------------------------------- */
 /* The whole page                                                     */
 /* ----------------------------------------------------------------- */
 
-export function Experience() {
+export function Experience({ page }: { page?: Page }) {
+  const art: Art = page && pageArt[page].image ? { image: pageArt[page].image!, credit: pageArt[page].credit ?? null } : home;
   const [menu, setMenu] = useState<Menu>(null);
+  const [textHidden, setTextHidden] = useState(false);
   const [drawer, setDrawer] = useState<Drawer>(null);
   const [lastDrawer, setLastDrawer] = useState<Exclude<Drawer, null> | null>(null);
 
@@ -326,11 +383,17 @@ export function Experience() {
       {p.title}
     </button>
   ));
-  const aboutItems = (["about", "books", "misc"] as const).map((k) => (
-    <button key={k} type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: k })}>
-      {k === "about" ? "About" : k === "books" ? "Books" : "Misc"}
-    </button>
-  ));
+  const aboutItems = [
+    <Link key="about" href="/about/" onClick={closeAll} className={`hover:opacity-50 ${page === "about" ? "underline underline-offset-4" : ""}`}>
+      About
+    </Link>,
+    <Link key="books" href="/books/" onClick={closeAll} className={`hover:opacity-50 ${page === "books" ? "underline underline-offset-4" : ""}`}>
+      Books
+    </Link>,
+    <button key="misc" type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: "misc" })}>
+      Misc
+    </button>,
+  ];
   const links = linkItems().map(([label, href]) => (
     <a key={label} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noopener noreferrer" className="hover:opacity-50">
       {label}
@@ -344,26 +407,27 @@ export function Experience() {
   return (
     <>
       <Loader />
-      <Artwork dimmed={anyOpen} />
+      <Artwork dimmed={anyOpen} art={art} coverOnMobile={!!page && !textHidden} />
+      {page && <TextPanel key={page} page={page} faded={anyOpen} hidden={textHidden} setHidden={setTextHidden} />}
 
       {/* click-away layer */}
       {anyOpen && <button type="button" aria-label="Close" className="fixed inset-0 z-30 cursor-default" onClick={closeAll} />}
 
       {/* Credit tag for the artwork */}
-      {home.credit && (
-        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 transition-opacity duration-300 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7" style={{ opacity: anyOpen ? 0 : 1, visibility: anyOpen ? "hidden" : "visible" }}>
-          {home.credit.url ? (
-            <a href={home.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-              <CreditText c={home.credit} />
+      {art.credit && (
+        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 transition-opacity duration-300 [text-shadow:0_0_8px_rgba(0,0,0,0.95)] md:bottom-7" style={{ opacity: anyOpen ? 0 : 1, visibility: anyOpen ? "hidden" : "visible" }}>
+          {art.credit.url ? (
+            <a href={art.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <CreditText c={art.credit} />
             </a>
           ) : (
-            <CreditText c={home.credit} />
+            <CreditText c={art.credit} />
           )}
         </div>
       )}
 
       {/* Header */}
-      <header className="pointer-events-none fixed inset-0 z-40 text-white [text-shadow:0_0_12px_rgba(0,0,0,0.45)]">
+      <header className="pointer-events-none fixed inset-0 z-40 text-white [text-shadow:0_0_12px_rgba(0,0,0,0.8)]">
         {/* desktop top bar */}
         <div className="pointer-events-auto absolute inset-x-6 top-0 hidden h-[72px] items-center justify-between md:flex">
           <nav className="flex items-center gap-7">
@@ -391,10 +455,10 @@ export function Experience() {
           <Link href="/">{site.name}</Link>
         </h1>
         <div className="pointer-events-auto fixed inset-x-6 bottom-6 flex items-center justify-between md:hidden">
-          <button type="button" className="h-8 border border-neutral-300 px-2 font-bold text-neutral-300" aria-expanded={menu === "mobile"} onClick={() => toggle("mobile")}>
+          <button type="button" className="h-8 border border-neutral-300 bg-black/40 px-2 font-bold text-neutral-200 backdrop-blur" aria-expanded={menu === "mobile"} onClick={() => toggle("mobile")}>
             {menu === "mobile" ? "Close" : "Menu"}
           </button>
-          <button type="button" className="h-8 border border-neutral-300 px-2 font-bold text-neutral-300" aria-expanded={menu === "links"} onClick={() => toggle("links")}>
+          <button type="button" className="h-8 border border-neutral-300 bg-black/40 px-2 font-bold text-neutral-200 backdrop-blur" aria-expanded={menu === "links"} onClick={() => toggle("links")}>
             {menu === "links" ? "Close" : "Contact"}
           </button>
         </div>
@@ -412,13 +476,13 @@ export function Experience() {
           transform: menu === "projects" || menu === "about" || menu === "mobile" ? "none" : "translateX(-100%)",
         }}
       >
-        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "projects" ? "" : "pointer-events-none opacity-0"}`}>
+        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "projects" ? "" : "pointer-events-none invisible opacity-0"}`}>
           <MenuList open={menu === "projects"} items={projectItems} />
         </div>
-        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "about" ? "" : "pointer-events-none opacity-0"}`}>
+        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "about" ? "" : "pointer-events-none invisible opacity-0"}`}>
           <MenuList open={menu === "about"} items={aboutItems} />
         </div>
-        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "mobile" ? "" : "pointer-events-none opacity-0"}`}>
+        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "mobile" ? "" : "pointer-events-none invisible opacity-0"}`}>
           <h3 className="mb-3 font-bold opacity-60">Projects</h3>
           <MenuList open={menu === "mobile"} items={projectItems} />
           <h3 className="mb-3 mt-8 font-bold opacity-60">About</h3>

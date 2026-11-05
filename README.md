@@ -15,7 +15,8 @@ npm run build      # writes the static site to ./out
 - **Loader:** a white screen with your name, shown once per browser session. The artwork then blurs in.
 - **Homepage:** the artwork, always shown whole (never cropped) on any screen size, with its credit centered below.
 - **Header:** your name centered. Projects and About top-left each slide in a list from the left (About lists About / Books / Misc). Contact top-right and ® bottom-right drop a short list of links. On phones it collapses to Menu and Contact buttons at the bottom.
-- **Drawers:** each project and each About page (About, Books, Misc) slides in from the right.
+- **About and Books pages** (`/about`, `/books`): their own artwork, full-screen, with the text in a dark frosted strip over it. "Hide" tucks the text away to show the whole piece.
+- **Drawers:** each project and Misc slide in from the right.
 - **Articles:** every project has a full write-up at `/articles/<slug>`.
 
 ## Edit content
@@ -28,6 +29,7 @@ Everything is in **`src/content/site.ts`**. Anything marked `TODO` is placeholde
 | Homepage image and credit | `home` |
 | Projects and write-ups | `projects` |
 | About / Books / Misc | `about`, `books`, `misc` |
+| Art for About / Books | `pageArt` (falls back to the homepage art) |
 
 **Changing the artwork:** put the image in `public/`, then set `home.image` to its path (e.g. `"/my-image.jpg"`) and update `home.credit`. Add `url` to the credit to make it a link.
 
