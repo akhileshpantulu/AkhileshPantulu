@@ -492,7 +492,7 @@ export function Experience({ page }: { page?: Page }) {
         aria-modal="true"
         aria-label="Menu"
         aria-hidden={!(menu === "projects" || menu === "about" || menu === "mobile")}
-        className="fixed bottom-0 left-0 top-0 z-[45] w-[calc(100vw-120px)] max-w-[353px] text-white transition-all duration-500 ease-[cubic-bezier(.165,.84,.44,1)]"
+        className="fixed bottom-0 left-0 top-0 z-[36] w-[calc(100vw-120px)] max-w-[353px] text-white transition-all duration-500 ease-[cubic-bezier(.165,.84,.44,1)]"
         style={{
           visibility: menu === "projects" || menu === "about" || menu === "mobile" ? "visible" : "hidden",
           transform: menu === "projects" || menu === "about" || menu === "mobile" ? "none" : "translateX(-100%)",
