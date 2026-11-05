@@ -15,41 +15,6 @@ const DEFAULT_ASPECT = 16 / 9;
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /* ----------------------------------------------------------------- */
-/* Loader: white screen with the name, shown once per browser session */
-/* ----------------------------------------------------------------- */
-
-function Loader() {
-  const [state, setState] = useState<"show" | "fade" | "gone">("show");
-  useIsoLayoutEffect(() => {
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem("loaded") === "1";
-      sessionStorage.setItem("loaded", "1");
-    } catch {}
-    if (seen) {
-      setState("gone");
-      return;
-    }
-    const a = setTimeout(() => setState("fade"), 900);
-    const b = setTimeout(() => setState("gone"), 1900);
-    return () => {
-      clearTimeout(a);
-      clearTimeout(b);
-    };
-  }, []);
-  if (state === "gone") return null;
-  return (
-    <div
-      aria-hidden="true"
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-white text-black transition-opacity duration-1000"
-      style={{ opacity: state === "fade" ? 0 : 1 }}
-    >
-      <h2 className="text-lg font-semibold">{site.name}</h2>
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------------- */
 /* Artwork: the homepage image, fit whole inside the screen           */
 /* ----------------------------------------------------------------- */
 
@@ -487,7 +452,6 @@ export function Experience({ page }: { page?: Page }) {
 
   return (
     <>
-      <Loader />
       <Artwork key={art.image} dimmed={anyOpen} art={art} coverOnMobile={!!textPage && !textHidden} />
       {textPage && <TextPanel key={textPage} page={textPage} faded={anyOpen} hidden={textHidden} setHidden={setTextHidden} />}
 

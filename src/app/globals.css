@@ -14,6 +14,56 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* First-open splash (see src/components/splash.tsx). Hidden unless the
+   inline script turns it on, so repeat visits never flash white. */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #000;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: opacity 0.75s ease;
+}
+#splash.splash-out {
+  opacity: 0;
+}
+.splash-line {
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+}
+.splash-ghost {
+  visibility: hidden;
+}
+.splash-typed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: pre;
+}
+.splash-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 3px;
+  background: currentColor;
+  transform: translateY(1px);
+}
+#splash.splash-done .splash-caret {
+  animation: splash-blink 0.5s steps(1) infinite;
+}
+@keyframes splash-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 .scrollbar-hidden {
   scrollbar-width: none;
 }
