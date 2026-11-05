@@ -7,7 +7,7 @@ export default function Home() {
     "@type": "Person",
     name: site.name,
     url: site.url,
-    sameAs: [site.links.github, site.links.linkedin],
+    sameAs: [site.links.linkedin],
   };
   return (
     <>

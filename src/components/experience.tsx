@@ -213,7 +213,6 @@ function MenuList({ items, open, align = "start" }: { items: React.ReactNode[]; 
 function linkItems() {
   const l = site.links;
   const items: [string, string][] = [
-    ["GitHub", l.github],
     ["LinkedIn", l.linkedin],
     ["Email", `mailto:${l.email}`],
   ];
@@ -251,7 +250,7 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
       <div className="flex flex-col gap-6">
         <p className="leading-relaxed text-neutral-700">{contact.blurb}</p>
         <ul className="flex flex-col gap-2 text-2xl font-bold">
-          {linkItems().filter(([label]) => label !== "GitHub").map(([label, href]) => (
+          {linkItems().map(([label, href]) => (
             <li key={label}>
               <a href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noopener noreferrer" className="hover:opacity-50">
                 {label}

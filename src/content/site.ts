@@ -11,7 +11,6 @@ export const site = {
   description: "Akhilesh Pantulu's portfolio of analytics and machine learning projects.",
 
   links: {
-    github: "https://github.com/akhileshpantulu",
     linkedin: "https://www.linkedin.com/in/pantulu",
     email: "pantuluinvestments@gmail.com",
     // Put your resume PDF in /public and set the path here, or leave null to hide it.
@@ -136,7 +135,6 @@ export const projects: Project[] = [
       { type: "h2", text: "Results" },
       { type: "p", text: "State the result plainly, with numbers." },
     ],
-    link: { label: "View the code", url: "https://github.com/akhileshpantulu" },
   },
   {
     slug: "project-two",
