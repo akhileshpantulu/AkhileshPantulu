@@ -57,7 +57,7 @@ export default async function Article({ params }: { params: Promise<{ slug: stri
         <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
           {longDate(p.date)} · {p.topics}
         </div>
-        <h1 className="mt-4 text-[clamp(36px,6vw,60px)] font-bold leading-[1.02] tracking-tight">{p.title}</h1>
+        <h1 className="mt-4 font-serif text-[clamp(44px,7vw,76px)] font-normal leading-[1.02]">{p.title}</h1>
         <p className="mt-6 text-xl leading-relaxed text-neutral-700">{p.summary}</p>
         <div className="mt-6 flex flex-wrap items-center gap-2">
           {p.stack.map((s) => (

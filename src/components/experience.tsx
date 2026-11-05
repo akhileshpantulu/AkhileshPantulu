@@ -216,7 +216,7 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
       <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
         {longDate(p.date)} · {p.topics}
       </div>
-      <h3 className="text-3xl font-bold leading-tight">{p.title}</h3>
+      <h3 className="font-serif text-[40px] font-normal leading-[1.05]">{p.title}</h3>
       <p className="leading-relaxed text-neutral-700">{p.summary}</p>
       <div className="flex flex-wrap gap-1.5">
         {p.stack.map((s) => (
@@ -400,7 +400,7 @@ export function Experience({ page }: { page?: Page }) {
   }, [closeAll]);
 
   const projectItems = projects.map((p) => (
-    <button key={p.slug} type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: "project", slug: p.slug })}>
+    <button key={p.slug} type="button" className="text-left font-serif text-[32px] font-normal leading-[1.1] hover:opacity-50" onClick={() => openDrawer({ kind: "project", slug: p.slug })}>
       {p.title}
     </button>
   ));
