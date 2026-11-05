@@ -294,24 +294,50 @@ function AboutText() {
   );
 }
 
+function BookCover({ src, title }: { src: string; title: string }) {
+  const [ok, setOk] = useState(true);
+  const img = useRef<HTMLImageElement>(null);
+  // Covers can fail before hydration, so also check once on mount.
+  useEffect(() => {
+    const el = img.current;
+    if (el?.complete && el.naturalWidth === 0) setOk(false);
+  }, []);
+  if (!ok) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={img}
+      src={src}
+      alt={`Cover of ${title}`}
+      onError={() => setOk(false)}
+      className="h-[96px] w-16 flex-none object-cover shadow-[0_6px_18px_rgba(0,0,0,0.5)]"
+    />
+  );
+}
+
 function BooksText() {
   return (
     <ul className="flex flex-col divide-y divide-white/15">
-      {books.map((bk) => (
-        <li key={bk.title} className="py-4 first:pt-0 last:pb-0">
-          <div className="text-xl font-bold leading-tight">
-            {bk.url ? (
-              <a href={bk.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-60">
-                {bk.title}
-              </a>
-            ) : (
-              bk.title
-            )}
-          </div>
-          <div className="mt-1 text-sm text-white/55">{bk.author}</div>
-          {bk.note && <p className="mt-2 text-sm leading-relaxed text-white/80">{bk.note}</p>}
-        </li>
-      ))}
+      {books.map((bk) => {
+        const title = bk.url ? (
+          <a href={bk.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-60">
+            {bk.title}
+          </a>
+        ) : (
+          bk.title
+        );
+        return (
+          <li key={bk.title} className="flex gap-4 py-5 first:pt-0 last:pb-0">
+            {bk.cover && <BookCover src={bk.cover} title={bk.title} />}
+            <div className="min-w-0">
+              <div className="text-xl font-bold leading-tight">{title}</div>
+              {bk.subtitle && <div className="mt-1 text-sm leading-snug text-white/75">{bk.subtitle}</div>}
+              <div className="mt-1.5 text-sm text-white/55">{bk.author}</div>
+              {bk.note && <p className="mt-2 text-sm leading-relaxed text-white/80">{bk.note}</p>}
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }

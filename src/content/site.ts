@@ -133,13 +133,28 @@ export const about = {
 };
 
 
-/* Books: shown in About → Books. TODO: replace with your own. */
-export const books: { title: string; author: string; note?: string; url?: string }[] = [
-  { title: "Book Title One", author: "Author Name", note: "One line on why it stuck with you." },
-  { title: "Book Title Two", author: "Author Name", note: "One line on why it stuck with you." },
-  { title: "Book Title Three", author: "Author Name" },
+/* Books: shown in About → Books. */
+export const books: {
+  title: string;
+  subtitle?: string;
+  author: string;
+  note?: string;
+  url?: string;
+  cover?: string; // image in /public, e.g. "/roll-the-calls.jpg" (hidden if the file is missing)
+}[] = [
+  {
+    title: "Roll the Calls",
+    subtitle: "A Memoir",
+    author: "Ari Emanuel",
+    cover: "/roll-the-calls.jpg",
+  },
+  {
+    title: "The Caesars Palace Coup",
+    subtitle: "How a Billionaire Brawl Over the Famous Casino Exposed the Power and Greed of Wall Street",
+    author: "Sujeet Indap and Max Frumes",
+    cover: "/caesars-palace-coup.jpg",
+  },
 ];
-
 /* Misc: shown in About → Misc. Anything else: interests, links, notes. TODO. */
 export const misc: { title: string; text: string; url?: string }[] = [
   { title: "Something I'm into", text: "A sentence or two about it." },
