@@ -14,12 +14,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description: site.description },
 };
 
-export const viewport: Viewport = { themeColor: "#0c0c0e" };
+export const viewport: Viewport = { themeColor: "#000000" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-bg text-fg">{children}</body>
+      <body className="min-h-full bg-black text-white">{children}</body>
     </html>
   );
 }

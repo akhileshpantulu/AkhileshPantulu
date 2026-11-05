@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { projects, type ArticleBlock } from "@/content/site";
-import { DotGrid } from "@/components/dot-grid";
-import { Footer } from "@/components/footer";
+import { projects, site, type ArticleBlock } from "@/content/site";
 import { longDate } from "@/components/format";
-import { Nav } from "@/components/nav";
-import { PreviewChart } from "@/components/previews";
-import { StackChips } from "@/components/section";
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
@@ -19,8 +13,7 @@ export const dynamicParams = false;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const p = projects.find((x) => x.slug === slug);
-  if (!p) return {};
-  return { title: p.title, description: p.summary };
+  return p ? { title: p.title, description: p.summary } : {};
 }
 
 function Block({ b }: { b: ArticleBlock }) {
@@ -54,50 +47,41 @@ export default async function Article({ params }: { params: Promise<{ slug: stri
   if (!p) notFound();
 
   return (
-    <>
-      <DotGrid />
-      <main className="relative z-10">
-        <Nav home />
-        <article className="mx-auto w-full max-w-3xl px-6 pb-24 pt-16 sm:px-8 sm:pt-24">
-          <Link
-            href="/#projects"
-            className="mb-10 inline-flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-[0.16em] text-fg-muted transition-colors hover:text-accent-bright"
-          >
-            <ArrowLeft size={13} strokeWidth={2} /> all projects
-          </Link>
-          <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[10.5px] uppercase tracking-[0.18em]">
-            <span className="text-fg-dim">Published · {longDate(p.date)}</span>
-            <span className="text-accent">{p.topics}</span>
-          </div>
-          <h1 className="text-[clamp(34px,5.5vw,56px)] font-medium leading-[1.05] tracking-[-0.025em] text-fg-bright">{p.title}</h1>
-          <p className="mt-6 text-[19px] leading-[1.55] text-fg-muted">{p.summary}</p>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <StackChips items={p.stack} variant="plain" />
-            {p.link && (
-              <a
-                href={p.link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-1.5 font-mono text-[12px] tracking-[0.04em] text-accent hover:text-accent-bright"
-              >
-                {p.link.label}
-                <ArrowUpRight size={14} strokeWidth={1.75} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </a>
-            )}
-          </div>
-          <div className="liquid-glass mt-10 rounded-2xl p-5 sm:p-7">
-            <div className="flex h-[180px] items-center sm:h-[220px]">
-              <PreviewChart preview={p.preview} />
-            </div>
-          </div>
-          <div className="prose-article mt-12">
-            {p.body.map((b, i) => (
-              <Block key={i} b={b} />
-            ))}
-          </div>
-        </article>
-        <Footer />
-      </main>
-    </>
+    <div className="min-h-screen bg-white text-black">
+      <header className="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-black bg-white px-6">
+        <Link href="/rooms/studio/" className="font-semibold hover:opacity-50">
+          ← Studio
+        </Link>
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 font-bold">
+          {site.name}
+        </Link>
+        <span />
+      </header>
+      <article className="mx-auto w-full max-w-2xl px-6 pb-24 pt-14 sm:pt-20">
+        <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+          {longDate(p.date)} · {p.topics}
+        </div>
+        <h1 className="mt-4 text-[clamp(36px,6vw,60px)] font-bold leading-[1.02] tracking-tight">{p.title}</h1>
+        <p className="mt-6 text-xl leading-relaxed text-neutral-700">{p.summary}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          {p.stack.map((s) => (
+            <span key={s} className="border border-black px-2 py-0.5 text-xs font-semibold">
+              {s}
+            </span>
+          ))}
+          {p.link && (
+            <a href={p.link.url} target="_blank" rel="noopener noreferrer" className="ml-2 text-sm font-semibold underline underline-offset-4 hover:opacity-50">
+              {p.link.label} ↗
+            </a>
+          )}
+        </div>
+        <hr className="my-12 border-black" />
+        <div className="prose-article">
+          {p.body.map((b, i) => (
+            <Block key={i} b={b} />
+          ))}
+        </div>
+      </article>
+    </div>
   );
 }

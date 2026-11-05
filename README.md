@@ -1,6 +1,6 @@
 # akhileshpantulu.com
 
-Personal portfolio site. Next.js 16 (App Router, static export), Tailwind CSS v4, Geist fonts, and Motion for animation.
+Personal portfolio site built as a set of explorable rooms. Each room is a full-screen scene with beacons that move you to another room or open a panel. Built with Next.js 16 (App Router, static export) and Tailwind CSS v4.
 
 ## Run it
 
@@ -10,50 +10,40 @@ npm run dev        # http://localhost:3000
 npm run build      # writes the static site to ./out
 ```
 
+## How it's laid out
+
+- **Loader:** a white screen with your name, shown once per browser session.
+- **Rooms:** `/` (Front), `/rooms/studio`, `/rooms/library`. Each scene blurs in on arrival. On phones the room is wider than the screen and can be swiped sideways.
+- **Header:** your name centered; Projects / Stack / About top-left, Contact top-right, Explore (room list) bottom-left, ® (links) bottom-right. On phones it collapses to Menu and Contact buttons at the bottom.
+- **Drawers:** About, Contact, Tech Stack (draggable icons), and each project slide in from the right.
+- **Articles:** every project has a full write-up at `/articles/<slug>`.
+
 ## Edit content
 
-All copy, projects, and links live in **`src/content/site.ts`**. Anything marked `TODO` is placeholder text.
+Everything is in **`src/content/site.ts`**. Anything marked `TODO` is placeholder text.
 
-| Section | What to edit in `site.ts` |
+| What | Where in `site.ts` |
 | --- | --- |
-| Header / hero | `site` (name, intro, links, resume path) |
-| 01 Projects | `projects`: each one also gets a page at `/articles/<slug>` |
-| 02 Tech | `tech`: icon keys map to `src/components/tech-icons.tsx` |
-| 03 About | `about` |
-| 04 Contact | `contact` |
+| Name, links, resume | `site` |
+| Rooms and their beacons | `rooms` |
+| Projects and write-ups | `projects` |
+| Tech stack icons | `tech` (icon keys map to `src/components/tech-icons.tsx`) |
+| About / contact text | `about`, `contact` |
 
-**Resume:** drop a PDF in `public/` and set `site.links.resume` to its path, e.g. `"/Akhilesh-Pantulu-Resume.pdf"`. The resume buttons stay hidden while it's `null`.
+**Beacons:** each has `x` / `y` as percentages of the scene, a `label`, and an `action`:
 
-**Card charts:** each project has a `preview` with one of five `kind`s, all animated on scroll:
+- `{ room: "studio" }`: go to another room
+- `{ panel: "about" | "contact" | "stack" }`: open a drawer
+- `{ project: "project-one" }`: open a project
+- `{ url: "https://..." }`: external link
 
-- `leaderboard`: ranked rows with scores and bars
-- `bars`: labeled metric bars with an optional footer
-- `sparkline`: line/area chart over time
-- `hbars`: horizontal bar comparison
-- `columns`: vertical column chart
+Use `side: "left"` on beacons near the right edge so their label opens leftward.
 
-The types are in `src/components/previews.tsx`.
+**Using your own photos:** the rooms are SVG illustrations in `src/components/scenes.tsx`. To use a real photo, put a 16:9 image in `public/` and set `image: "/my-room.jpg"` on the room, then adjust the beacon positions to match.
 
-**Colors:** change the tokens at the top of `src/app/globals.css`. `--color-accent` re-skins the whole site.
+**Adding a room:** add an entry to `rooms` with an `image` (or a new scene in `scenes.tsx`). It's picked up by the Explore menu and gets a page at `/rooms/<handle>`.
 
-## Layout
-
-```
-src/
-  app/
-    layout.tsx               fonts, metadata
-    page.tsx                 homepage section order
-    articles/[slug]/page.tsx project article pages
-    not-found.tsx            404
-    globals.css              tokens, glass cards, article typography
-  components/
-    nav.tsx                  sticky header, active-section highlight, scroll progress
-    dot-grid.tsx             canvas background that lights up near the cursor
-    previews.tsx             animated card charts
-    tech-physics.tsx         drag-and-throw tech stack box
-    ...
-  content/site.ts            all content
-```
+**Resume:** drop a PDF in `public/` and set `site.links.resume`. It then appears in the ® menu and the Contact drawer.
 
 ## Deploy
 

@@ -19,7 +19,7 @@ export function TechPhysics() {
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const bodies = useRef<Body[]>([]);
   const drag = useRef<{ i: number; dx: number; dy: number; lx: number; ly: number; lt: number } | null>(null);
-  const [size, setSize] = useState(104);
+  const [size, setSize] = useState(72);
   const [hover, setHover] = useState<number | null>(null);
   const [held, setHeld] = useState<number | null>(null);
 
@@ -28,7 +28,7 @@ export function TechPhysics() {
     if (!box) return;
     let W = box.clientWidth;
     let H = box.clientHeight;
-    let S = Math.round(Math.min(104, Math.max(58, W / 8)));
+    let S = Math.round(Math.min(84, Math.max(52, W / 6)));
     setSize(S);
 
     const seed = () => {
@@ -45,7 +45,7 @@ export function TechPhysics() {
     const onResize = () => {
       W = box.clientWidth;
       H = box.clientHeight;
-      S = Math.round(Math.min(104, Math.max(58, W / 8)));
+      S = Math.round(Math.min(84, Math.max(52, W / 6)));
       setSize(S);
       for (const b of bodies.current) {
         b.r = S / 2;
@@ -210,22 +210,17 @@ export function TechPhysics() {
 
   return (
     <div
-      className="relative h-[420px] overflow-hidden rounded-2xl border border-white/[0.07] sm:h-[500px]"
-      style={{
-        background: "linear-gradient(180deg, rgba(22,23,27,0.94) 0%, rgba(15,16,20,0.94) 100%)",
-        boxShadow:
-          "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.45), 0 14px 38px -18px rgba(0,0,0,0.7)",
-      }}
+      className="relative h-[460px] overflow-hidden border border-neutral-200 bg-neutral-100"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.32]"
+        className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
         }}
       />
-      <div className="pointer-events-none absolute left-5 top-4 z-20 font-mono text-[12.5px] uppercase tracking-[0.2em] text-fg-dim">
+      <div className="pointer-events-none absolute left-4 top-3 z-20 text-xs font-semibold uppercase tracking-wider text-neutral-400">
         drag to pick up
       </div>
       <div ref={boxRef} className="relative h-full w-full select-none" style={{ touchAction: "none" }}>
@@ -257,13 +252,9 @@ export function TechPhysics() {
               }}
             >
               <div
-                className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-1 font-mono text-[12px] font-medium uppercase tracking-[0.2em] backdrop-blur-md transition-opacity duration-150"
+                className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap bg-black px-2.5 py-1 text-xs font-semibold text-white transition-opacity duration-150"
                 style={{
-                  bottom: "calc(100% + 8px)",
-                  color: t.color,
-                  backgroundColor: "rgba(10,11,13,0.88)",
-                  border: `1px solid ${t.color}55`,
-                  boxShadow: `0 6px 18px rgba(0,0,0,0.55), 0 0 12px ${t.color}33`,
+                  bottom: "calc(100% + 6px)",
                   opacity: showLabel ? 1 : 0,
                 }}
               >
@@ -273,7 +264,7 @@ export function TechPhysics() {
                 className="flex items-center justify-center transition-[transform,filter] duration-150 ease-out"
                 style={{
                   transform: `scale(${held === i ? 1.12 : hover === i ? 1.05 : 1})`,
-                  filter: `drop-shadow(0 ${held === i ? 12 : 4}px ${held === i ? 22 : 12}px rgba(0,0,0,0.6))`,
+                  filter: `drop-shadow(0 ${held === i ? 10 : 3}px ${held === i ? 16 : 6}px rgba(0,0,0,${held === i ? 0.3 : 0.15}))`,
                 }}
               >
                 <Icon size={iconSize} />

@@ -1,35 +1,101 @@
 /**
  * All site content lives in this file. Edit it and the whole site updates.
  *
- * Everything marked TODO is placeholder copy: replace it with your own
- * details, projects, and articles before deploying.
+ * The site is a set of "rooms": full-screen scenes with beacons you click to
+ * move between rooms or open a panel. Everything marked TODO is placeholder.
  */
-
-import type { Preview } from "@/components/previews";
 
 export const site = {
   name: "Akhilesh Pantulu",
-  // TODO: one-sentence intro under your name.
-  intro: "Building data products, models, and tools that make decisions easier.",
   url: "https://akhileshpantulu.com", // TODO: your domain
   description: "Akhilesh Pantulu's portfolio of analytics and machine learning projects.",
-  version: "v0.1.0",
 
   links: {
     github: "https://github.com/akhileshpantulu",
     linkedin: "https://www.linkedin.com/in/akhileshpantulu", // TODO: confirm handle
-    linkedinLabel: "in/akhileshpantulu",
-    githubLabel: "@akhileshpantulu",
     email: "hello@example.com", // TODO: public contact email
-    // Put your resume PDF in /public and set the path here, or set to null to hide the button.
+    // Put your resume PDF in /public and set the path here, or leave null to hide it.
     resume: null as string | null, // e.g. "/Akhilesh-Pantulu-Resume.pdf"
   },
 };
 
 /* ------------------------------------------------------------------ */
-/* 01 · Projects / articles. Each one gets its own page at             */
-/* /articles/<slug>. The first `projectsVisible` are shown; the rest   */
-/* sit behind a "View N more" button.                                  */
+/* Rooms                                                               */
+/*                                                                     */
+/* `scene` picks a built-in illustration (src/components/scenes.tsx).  */
+/* Set `image` to a 16:9 photo in /public to use your own picture      */
+/* instead, then move the beacons to match it.                         */
+/*                                                                     */
+/* Beacon x / y are percentages of the scene (0–100, from top-left).   */
+/* `side: "left"` makes the label open toward the left (use it for     */
+/* beacons near the right edge).                                       */
+/* ------------------------------------------------------------------ */
+
+export type Panel = "about" | "contact" | "stack";
+
+export type BeaconAction =
+  | { room: string } // go to another room
+  | { panel: Panel } // open a drawer
+  | { project: string } // open a project (by slug)
+  | { url: string }; // external link
+
+export type Beacon = {
+  x: number;
+  y: number;
+  label: string;
+  action: BeaconAction;
+  side?: "left" | "right";
+};
+
+export type Room = {
+  handle: string;
+  title: string;
+  scene: "front" | "studio" | "library";
+  image?: string;
+  beacons: Beacon[];
+};
+
+export const rooms: Room[] = [
+  {
+    handle: "front",
+    title: "Front",
+    scene: "front",
+    beacons: [
+      { x: 30.6, y: 58.9, label: "Enter Studio", action: { room: "studio" } },
+      { x: 39.4, y: 35.6, label: "Enter Library", action: { room: "library" } },
+      { x: 68.8, y: 58.9, label: "Tech Stack", action: { panel: "stack" }, side: "left" },
+      { x: 86.1, y: 63.9, label: "Get in Touch", action: { panel: "contact" }, side: "left" },
+    ],
+  },
+  {
+    handle: "studio",
+    title: "Studio",
+    scene: "studio",
+    beacons: [
+      { x: 34.1, y: 33.3, label: "Project One", action: { project: "project-one" } },
+      { x: 44.7, y: 33.3, label: "Project Two", action: { project: "project-two" } },
+      { x: 55.3, y: 33.3, label: "Project Three", action: { project: "project-three" } },
+      { x: 65.9, y: 33.3, label: "Project Four", action: { project: "project-four" }, side: "left" },
+      { x: 50, y: 55.6, label: "Tech Stack", action: { panel: "stack" } },
+      { x: 84.7, y: 53.3, label: "Back to Front", action: { room: "front" }, side: "left" },
+    ],
+  },
+  {
+    handle: "library",
+    title: "Library",
+    scene: "library",
+    beacons: [
+      { x: 38.1, y: 68.9, label: "About Me", action: { panel: "about" } },
+      { x: 14.4, y: 41.1, label: "Education", action: { panel: "about" } },
+      { x: 50, y: 30, label: "Enter Studio", action: { room: "studio" } },
+      { x: 84.7, y: 53.3, label: "Back to Front", action: { room: "front" }, side: "left" },
+    ],
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Projects. Each opens in the side drawer and has a full write-up at  */
+/* /articles/<slug>.                                                   */
 /* ------------------------------------------------------------------ */
 
 export type ArticleBlock =
@@ -44,33 +110,21 @@ export type Project = {
   title: string;
   summary: string;
   date: string; // ISO date, e.g. "2026-06-12"
-  topics: string; // shown in accent on the card, e.g. "NLP · SEC · 10-K"
+  topics: string;
   stack: string[];
-  preview: Preview;
   body: ArticleBlock[];
-  link?: { label: string; url: string }; // optional repo / demo link on the article page
+  link?: { label: string; url: string }; // optional repo / demo link
 };
-
-export const projectsVisible = 3;
 
 export const projects: Project[] = [
   {
     slug: "project-one",
-    title: "Project One: A Headline That States the Finding",
+    title: "Project One",
     summary:
-      "Two or three sentences on the question, the data, and the answer. Write it so someone skimming the page knows the result without clicking.",
+      "Two or three sentences on the question, the data, and the answer. Write it so someone skimming knows the result without clicking.",
     date: "2026-10-01",
     topics: "Topic · Method · Tool",
     stack: ["python", "pandas", "sklearn"],
-    preview: {
-      kind: "sparkline",
-      title: "Metric over time",
-      points: [11, 12, 12, 12, 13, 13, 13, 14, 18, 20, 21, 21, 21.5, 22],
-      startLabel: "2013",
-      endLabel: "2026",
-      yLabel: "RATE %",
-      suffix: "%",
-    },
     body: [
       { type: "p", text: "TODO: Open with the question and why it matters." },
       { type: "h2", text: "Data" },
@@ -81,77 +135,45 @@ export const projects: Project[] = [
       { type: "h2", text: "Results" },
       { type: "p", text: "State the result plainly, with numbers." },
     ],
-    link: { label: "view the code", url: "https://github.com/akhileshpantulu" },
+    link: { label: "View the code", url: "https://github.com/akhileshpantulu" },
   },
   {
     slug: "project-two",
-    title: "Project Two: What the Model Caught",
-    summary:
-      "A short description of a second project. Lead with the number that matters and one surprising detail.",
+    title: "Project Two",
+    summary: "A short description of a second project. Lead with the number that matters and one surprising detail.",
     date: "2026-08-15",
     topics: "NLP · Classification",
     stack: ["python", "sklearn", "nlp"],
-    preview: {
-      kind: "hbars",
-      title: "PRECISION → HORIZON",
-      rows: [
-        { label: "in-sample", value: 46 },
-        { label: "+ feature A", value: 61 },
-        { label: "+ feature B", value: 69 },
-      ],
-      suffix: "%",
-    },
-    body: [
-      { type: "p", text: "TODO: Write the article." },
-    ],
+    body: [{ type: "p", text: "TODO: Write the article." }],
   },
   {
     slug: "project-three",
-    title: "Project Three: Reducing Something by a Lot",
-    summary: "Explain the before and after. Charts on the card show the headline result.",
+    title: "Project Three",
+    summary: "Explain the before and after, and what changed because of the work.",
     date: "2026-06-12",
-    topics: "Privacy · Pipelines",
+    topics: "Pipelines · SQL",
     stack: ["python", "duckdb"],
-    preview: {
-      kind: "columns",
-      title: "UNIQUE %",
-      columns: [
-        { label: "RAW", value: 90, showValue: true },
-        { label: "×15", value: 42 },
-        { label: "×60", value: 12 },
-        { label: "AGG", value: 0.06, showValue: true },
-      ],
-      suffix: "%",
-    },
     body: [{ type: "p", text: "TODO: Write the article." }],
   },
   {
     slug: "project-four",
-    title: "Project Four: Hidden Until Expanded",
-    summary: "Projects past the first three are tucked behind the “View more” button.",
+    title: "Project Four",
+    summary: "One more project. Add or remove entries freely; the Projects menu lists all of them.",
     date: "2026-03-02",
     topics: "Forecasting",
     stack: ["r", "sql"],
-    preview: {
-      kind: "sparkline",
-      title: "Forecast vs actual",
-      points: [40, 42, 39, 45, 47, 50, 49, 53, 57, 56, 60],
-      startLabel: "JAN",
-      endLabel: "NOV",
-      yLabel: "UNITS",
-    },
     body: [{ type: "p", text: "TODO: Write the article." }],
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/* 02 · Tech stack. Icons are draggable in a little physics box.       */
+/* Tech stack. Shown as draggable icons in the "Tech Stack" drawer.    */
 /* `icon` keys map to components in src/components/tech-icons.tsx.     */
 /* ------------------------------------------------------------------ */
 
 export const tech: { name: string; icon: string; color: string }[] = [
   { name: "python", icon: "python", color: "#3776AB" },
-  { name: "sql", icon: "database", color: "#EBE9E3" },
+  { name: "sql", icon: "database", color: "#3f3f46" },
   { name: "r", icon: "r", color: "#276DC3" },
   { name: "pandas", icon: "pandas", color: "#E70488" },
   { name: "scikit-learn", icon: "sklearn", color: "#F7931E" },
@@ -161,15 +183,15 @@ export const tech: { name: string; icon: string; color: string }[] = [
   { name: "postgres", icon: "postgres", color: "#4169E1" },
   { name: "docker", icon: "docker", color: "#2496ED" },
   { name: "excel", icon: "excel", color: "#21A366" },
-  { name: "power bi", icon: "bars", color: "#F2C811" },
+  { name: "power bi", icon: "bars", color: "#d4a800" },
   { name: "typescript", icon: "typescript", color: "#3178C6" },
-  { name: "react", icon: "react", color: "#61DAFB" },
-  { name: "next.js", icon: "next", color: "#EBE9E3" },
+  { name: "react", icon: "react", color: "#149eca" },
+  { name: "next.js", icon: "next", color: "#111111" },
   { name: "claude", icon: "claude", color: "#D97757" },
 ];
 
 /* ------------------------------------------------------------------ */
-/* 03 · About                                                          */
+/* About and contact drawers                                           */
 /* ------------------------------------------------------------------ */
 
 export const about = {
@@ -187,20 +209,6 @@ export const about = {
   ],
 };
 
-/* ------------------------------------------------------------------ */
-/* 04 · Contact                                                        */
-/* ------------------------------------------------------------------ */
-
 export const contact = {
-  headline: "Always up for the next",
-  headlineAccent: "problem worth solving.",
   blurb: "Happy to connect about projects, ideas, or interesting problems in AI, ML, and analytics.",
 };
-
-/* Navigation. Order and labels for the header; ids must match sections. */
-export const nav = [
-  { id: "projects", label: "projects" },
-  { id: "tech", label: "tech" },
-  { id: "about", label: "about" },
-  { id: "contact", label: "contact" },
-];
