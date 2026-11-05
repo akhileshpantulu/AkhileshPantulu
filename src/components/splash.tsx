@@ -4,25 +4,21 @@ import { site } from "@/content/site";
  * First-open splash: the name types out on a white screen, then fades.
  *
  * It is plain HTML plus a tiny inline script that runs while the page is
- * still being parsed, before anything is painted. It plays at most once
- * every 12 hours per browser; otherwise the script removes it straight
- * away, so the white screen never flashes. It lives in the root layout, so moving between
- * pages never shows it again.
+ * still being parsed, before anything is painted. It plays on every open
+ * of the site; when a page is opened from a link on the site itself the
+ * script removes it before paint, so the white screen never flashes. It
+ * lives in the root layout, so moving between pages never shows it again.
  */
 export function Splash() {
   const script = `(function () {
   var el = document.getElementById("splash");
   if (!el) return;
-  // Show at most once every 12 hours per browser (all tabs share this).
-  var seen = false;
-  try {
-    var last = Number(localStorage.getItem("splash-seen") || 0);
-    seen = Date.now() - last < 12 * 60 * 60 * 1000;
-    if (!seen) localStorage.setItem("splash-seen", String(Date.now()));
-  } catch (e) {}
-  // Add ?splash to the address to force it to play (handy for previewing).
-  try { if (new URLSearchParams(location.search).has("splash")) seen = false; } catch (e) {}
-  if (seen) { el.remove(); return; }
+  // Play on every open of the site. Skip it only when this page was opened
+  // from a link on the site itself (e.g. a project opened in a new tab), so
+  // it never interrupts someone already browsing.
+  var internal = false;
+  try { internal = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+  if (internal) { el.remove(); return; }
   el.style.display = "flex";
   var name = ${JSON.stringify(site.name)};
   var text = document.getElementById("splash-text");

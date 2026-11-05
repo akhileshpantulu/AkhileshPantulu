@@ -12,7 +12,7 @@ npm run build      # writes the static site to ./out
 
 ## How it's laid out
 
-- **Splash:** on first open your name types out on a white screen, then fades into the site. It plays at most once every 12 hours per browser and never on page-to-page navigation (see `src/components/splash.tsx`).
+- **Splash:** your name types out on a white screen, then fades into the site. It plays every time the site is opened (including a refresh), but never when moving between pages or opening a page from a link on the site (see `src/components/splash.tsx`).
 - **Homepage:** the artwork, always shown whole (never cropped) on any screen size, with its credit centered below.
 - **Header:** your name centered. Projects and About top-left each slide in a list from the left (About lists About / Books / Art / Misc). Contact top-right drops a short list of links. On phones it collapses to Menu and Contact buttons at the bottom.
 - **About and Books pages** (`/about`, `/books`): their own artwork, full-screen, with the text in a dark frosted panel down the full left side. Clicking outside it, pressing Escape, or "Hide" tucks it away to show the whole piece.
