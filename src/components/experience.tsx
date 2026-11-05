@@ -279,6 +279,14 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
 const drawerTitle = (d: Exclude<Drawer, null>) =>
   d.kind === "about" ? "About" : d.kind === "contact" ? "Contact" : d.kind === "stack" ? "Tech Stack" : "Project";
 
+function CreditText({ c }: { c: NonNullable<Room["credit"]> }) {
+  return (
+    <>
+      <span className="italic">{c.title}</span>, {c.artist}, {c.year} · {c.museum}
+    </>
+  );
+}
+
 /* ----------------------------------------------------------------- */
 /* The whole page                                                     */
 /* ----------------------------------------------------------------- */
@@ -348,6 +356,19 @@ export function Experience({ handle }: { handle: string }) {
 
       {/* click-away layer */}
       {anyOpen && <button type="button" aria-label="Close" className="fixed inset-0 z-30 cursor-default" onClick={closeAll} />}
+
+      {/* Credit tag for artwork / photos */}
+      {room.credit && (
+        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 w-max max-w-[calc(100vw-48px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7">
+          {room.credit.url ? (
+            <a href={room.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <CreditText c={room.credit} />
+            </a>
+          ) : (
+            <CreditText c={room.credit} />
+          )}
+        </div>
+      )}
 
       {/* Header */}
       <header className="pointer-events-none fixed inset-0 z-40 text-white [text-shadow:0_0_12px_rgba(0,0,0,0.45)]">

@@ -52,6 +52,8 @@ export type Room = {
   title: string;
   scene: "front" | "studio" | "library";
   image?: string;
+  // Optional credit tag shown at the bottom of the room (for artwork or photos).
+  credit?: { title: string; artist: string; year: string; museum: string; url?: string };
   beacons: Beacon[];
 };
 
