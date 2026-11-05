@@ -20,6 +20,47 @@ body {
   display: none;
 }
 
+/* Text-over-art panel (About, Books).
+   Phones: a card between the name and the bottom buttons.
+   Desktop: full height down the whole left side, under the header menu. */
+.text-panel {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: 84px;
+  bottom: 128px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.text-panel-show {
+  position: fixed;
+  left: 16px;
+  top: 84px;
+}
+@media (max-width: 767px) and (max-height: 500px) {
+  .text-panel {
+    top: 48px;
+    bottom: 64px;
+  }
+  .text-panel-show {
+    top: 48px;
+  }
+}
+@media (min-width: 768px) {
+  .text-panel {
+    left: 0;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: min(480px, 40vw);
+    padding-top: 72px;
+    border-width: 0 1px 0 0;
+  }
+  .text-panel-show {
+    left: 24px;
+    top: 88px;
+  }
+}
+
 /* Article pages: black on white */
 .prose-article p {
   font-size: 17px;

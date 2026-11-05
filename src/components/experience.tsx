@@ -58,6 +58,19 @@ function Artwork({ dimmed, art, coverOnMobile = false }: { dimmed: boolean; art:
   const [revealed, setRevealed] = useState(false);
   const [aspect, setAspect] = useState(DEFAULT_ASPECT);
   const [failed, setFailed] = useState(false);
+  // Animate size changes only when switching between fill and fit (phone
+  // Hide/Show), never while the window is being resized.
+  const [animating, setAnimating] = useState(false);
+  const firstMode = useRef(true);
+  useEffect(() => {
+    if (firstMode.current) {
+      firstMode.current = false;
+      return;
+    }
+    setAnimating(true);
+    const t = setTimeout(() => setAnimating(false), 750);
+    return () => clearTimeout(t);
+  }, [coverOnMobile]);
 
   // The image can finish (or fail) before React hydrates, so check once on mount.
   useEffect(() => {
@@ -113,7 +126,7 @@ function Artwork({ dimmed, art, coverOnMobile = false }: { dimmed: boolean; art:
           className="relative"
           style={
             box
-              ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y, transition: revealed ? "all 0.7s cubic-bezier(.165,.84,.44,1)" : undefined }
+              ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y, transition: animating ? "all 0.7s cubic-bezier(.165,.84,.44,1)" : undefined }
               : { visibility: "hidden" }
           }
         >
@@ -318,14 +331,23 @@ function TextPanel({ page, faded, hidden, setHidden }: { page: Page; faded: bool
     const t = setTimeout(() => setEntered(true), 350);
     return () => clearTimeout(t);
   }, []);
-  const title = page === "about" ? "About" : "Books";
   const visible = entered && !hidden && !faded;
+  // Escape tucks the text away (menus close first when one is open).
+  useEffect(() => {
+    if (!visible) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setHidden(true);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [visible, setHidden]);
+  const title = page === "about" ? "About" : "Books";
   return (
     <>
+      {/* clicking anywhere outside the panel hides it */}
+      {visible && <button type="button" aria-label={`Hide ${title}`} className="fixed inset-0 z-[34] cursor-default" onClick={() => setHidden(true)} />}
       <section
         aria-label={title}
-        className="fixed inset-x-4 bottom-[128px] top-[84px] z-[35] flex flex-col border border-white/10 bg-black/55 text-white backdrop-blur-xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(.165,.84,.44,1)] md:inset-x-auto md:bottom-[88px] md:left-6 md:top-[88px] md:w-[min(440px,40vw)] [@media(max-height:500px)]:bottom-[64px] [@media(max-height:500px)]:top-[48px]"
-        style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateX(-12px)", visibility: visible ? "visible" : "hidden" }}
+        className="text-panel z-[35] flex flex-col bg-black/55 text-white backdrop-blur-xl transition-[opacity,transform] duration-700 ease-[cubic-bezier(.165,.84,.44,1)]"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateX(-24px)", visibility: visible ? "visible" : "hidden" }}
       >
         <div className="flex h-14 flex-none items-center justify-between border-b border-white/15 px-6">
           <h2 className="font-bold">{title}</h2>
@@ -338,7 +360,7 @@ function TextPanel({ page, faded, hidden, setHidden }: { page: Page; faded: bool
       <button
         type="button"
         onClick={() => setHidden(false)}
-        className="fixed left-4 top-[84px] z-[35] h-8 border border-white/60 bg-black/40 px-2.5 text-sm font-bold text-white backdrop-blur transition-opacity duration-500 md:left-6 md:top-[88px] [@media(max-height:500px)]:top-[48px]"
+        className="text-panel-show z-[35] h-8 border border-white/60 bg-black/40 px-2.5 text-sm font-bold text-white backdrop-blur transition-opacity duration-500"
         style={{ opacity: hidden && !faded ? 1 : 0, visibility: hidden && !faded ? "visible" : "hidden" }}
       >
         Show {title}
