@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { about, contact, projects, rooms, site, type Beacon as BeaconT, type Panel, type Room } from "@/content/site";
-import { Scene } from "./scenes";
+import { about, contact, home, projects, site, type Credit, type Panel } from "@/content/site";
 import { longDate } from "./format";
 
-type Menu = null | "projects" | "explore" | "links" | "mobile";
+type Menu = null | "projects" | "links" | "mobile";
 type Drawer = null | { kind: Panel } | { kind: "project"; slug: string };
 
-const ASPECT = 16 / 9;
+const DEFAULT_ASPECT = 16 / 9;
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /* ----------------------------------------------------------------- */
@@ -49,138 +47,74 @@ function Loader() {
 }
 
 /* ----------------------------------------------------------------- */
-/* Beacon: a ring with an arrow that expands to show its label        */
+/* Artwork: the homepage image, fit whole inside the screen           */
 /* ----------------------------------------------------------------- */
 
-function Arrow({ flip }: { flip?: boolean }) {
-  return (
-    <svg width="13" height="11" viewBox="0 0 13 11" fill="none" stroke="currentColor" strokeWidth="2" className={flip ? "-scale-x-100" : ""} aria-hidden="true">
-      <line x1="11.7" y1="4.78" x2="6.87" y2="9.6" />
-      <path d="M10.29 4.78 6.9 1.38" />
-      <line x1="10.5" y1="5.46" x2="1" y2="5.46" />
-    </svg>
-  );
-}
-
-function BeaconButton({ b, onAction }: { b: BeaconT; onAction: (b: BeaconT) => void }) {
-  const left = b.side === "left";
-  const inner = (
-    <span className={`beacon ${left ? "beacon-left" : ""}`}>
-      <span className="beacon-arrow">
-        <Arrow flip={left} />
-      </span>
-      <span className="beacon-label">{b.label}</span>
-    </span>
-  );
-  const style = {
-    left: `${b.x}%`,
-    top: `${b.y}%`,
-    transform: left ? "translate(calc(-100% + 12px), -50%)" : "translate(-12px, -50%)",
-  } as const;
-  const cls = "absolute z-20";
-  if ("room" in b.action) {
-    return (
-      <Link href={b.action.room === "front" ? "/" : `/rooms/${b.action.room}/`} className={cls} style={style} aria-label={b.label}>
-        {inner}
-      </Link>
-    );
-  }
-  if ("url" in b.action) {
-    return (
-      <a href={b.action.url} target="_blank" rel="noopener noreferrer" className={cls} style={style} aria-label={b.label}>
-        {inner}
-      </a>
-    );
-  }
-  return (
-    <button type="button" className={cls} style={style} aria-label={b.label} onClick={() => onAction(b)}>
-      {inner}
-    </button>
-  );
-}
-
-/* ----------------------------------------------------------------- */
-/* Room view: a 16:9 scene scaled to cover the viewport               */
-/* ----------------------------------------------------------------- */
-
-function RoomView({ room, dimmed, onAction }: { room: Room; dimmed: boolean; onAction: (b: BeaconT) => void }) {
-  const wrap = useRef<HTMLDivElement>(null);
+function Artwork({ dimmed }: { dimmed: boolean }) {
+  const img = useRef<HTMLImageElement>(null);
   const [box, setBox] = useState<{ w: number; h: number; x: number; y: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
-  // Image rooms are shown whole ("contain"); illustrated rooms fill the screen ("cover").
-  const [imgAspect, setImgAspect] = useState<number | null>(null);
-  const [imgFailed, setImgFailed] = useState(false);
-  const contain = !!room.image && !imgFailed;
-  const aspect = contain ? (imgAspect ?? ASPECT) : ASPECT;
+  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
+  const [failed, setFailed] = useState(false);
+
+  // The image can finish (or fail) before React hydrates, so check once on mount.
+  useEffect(() => {
+    const el = img.current;
+    if (el?.complete) {
+      if (el.naturalWidth === 0) setFailed(true);
+      else setAspect(el.naturalWidth / el.naturalHeight);
+    }
+    const t = requestAnimationFrame(() => setRevealed(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
 
   useIsoLayoutEffect(() => {
     const fit = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      if (contain) {
-        // Leave room for the header above and the credit / corner buttons below.
-        const md = vw >= 768;
-        const short = !md && vh < 500; // phone held sideways
-        const top = md ? 72 : short ? 48 : 84;
-        const bottom = md ? 72 : short ? 64 : 128;
-        const side = md ? 24 : 16;
-        const aw = vw - side * 2;
-        const ah = Math.max(120, vh - top - bottom);
-        const w = Math.min(aw, ah * aspect);
-        const h = w / aspect;
-        setBox({ w, h, x: (vw - w) / 2, y: top + (ah - h) / 2 });
-      } else {
-        const s = vw / vh > aspect ? { w: vw, h: vw / aspect } : { w: vh * aspect, h: vh };
-        setBox({ ...s, x: 0, y: 0 });
-      }
+      // Leave space for the header above and the credit / corner buttons below.
+      const md = vw >= 768;
+      const short = !md && vh < 500; // phone held sideways
+      const top = md ? 72 : short ? 48 : 84;
+      const bottom = md ? 72 : short ? 64 : 128;
+      const side = md ? 24 : 16;
+      const aw = vw - side * 2;
+      const ah = Math.max(120, vh - top - bottom);
+      const w = Math.min(aw, ah * aspect);
+      const h = w / aspect;
+      setBox({ w, h, x: (vw - w) / 2, y: top + (ah - h) / 2 });
     };
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
-  }, [room.handle, contain, aspect]);
+  }, [aspect]);
 
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setRevealed(true));
-    return () => cancelAnimationFrame(t);
-  }, [room.handle]);
-
-  // Cover mode on phones: the room is wider than the screen and can be
-  // panned sideways, so start centered.
-  useIsoLayoutEffect(() => {
-    const el = wrap.current;
-    if (!el || !box || contain) return;
-    el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
-    el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
-  }, [box, contain]);
+  const alt = home.credit ? `${home.credit.title} by ${home.credit.artist}` : "";
 
   return (
     <div
-      ref={wrap}
-      className={`scrollbar-hidden fixed inset-0 bg-black ${contain ? "overflow-hidden" : "overflow-auto"}`}
+      className="fixed inset-0 overflow-hidden bg-black"
       style={{
         filter: dimmed ? "blur(10px) brightness(0.55)" : revealed ? "blur(0px)" : "blur(25px)",
         transition: "filter 1s cubic-bezier(.165,.84,.44,1)",
       }}
     >
-      <div
-        className="relative"
-        style={
-          box
-            ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y }
-            : { width: "100vw", height: "100vh", visibility: contain ? "hidden" : undefined }
-        }
-      >
-        <Scene
-          room={room}
-          onImage={(a) => {
-            if (a === null) setImgFailed(true);
-            else setImgAspect(a);
-          }}
-        />
-        {room.beacons.map((b) => (
-          <BeaconButton key={b.label + b.x} b={b} onAction={onAction} />
-        ))}
-      </div>
+      {!failed && (
+        <div
+          className="relative"
+          style={box ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y } : { visibility: "hidden" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={img}
+            src={home.image}
+            alt={alt}
+            onLoad={(e) => setAspect(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)}
+            onError={() => setFailed(true)}
+            className="h-full w-full object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -302,7 +236,7 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
 const drawerTitle = (d: Exclude<Drawer, null>) =>
   d.kind === "about" ? "About" : d.kind === "contact" ? "Contact" : "Project";
 
-function CreditText({ c }: { c: NonNullable<Room["credit"]> }) {
+function CreditText({ c }: { c: Credit }) {
   return (
     <>
       <span className="italic">{c.title}</span>, {c.artist}, {c.year} · {c.museum}
@@ -314,9 +248,7 @@ function CreditText({ c }: { c: NonNullable<Room["credit"]> }) {
 /* The whole page                                                     */
 /* ----------------------------------------------------------------- */
 
-export function Experience({ handle }: { handle: string }) {
-  const room = rooms.find((r) => r.handle === handle) ?? rooms[0];
-  const router = useRouter();
+export function Experience() {
   const [menu, setMenu] = useState<Menu>(null);
   const [drawer, setDrawer] = useState<Drawer>(null);
   const [lastDrawer, setLastDrawer] = useState<Exclude<Drawer, null> | null>(null);
@@ -341,25 +273,9 @@ export function Experience({ handle }: { handle: string }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [closeAll]);
 
-  const onAction = (b: BeaconT) => {
-    if ("panel" in b.action) openDrawer({ kind: b.action.panel });
-    else if ("project" in b.action) openDrawer({ kind: "project", slug: b.action.project });
-  };
-
-  const roomHref = (h: string) => (h === "front" ? "/" : `/rooms/${h}/`);
-  const go = (h: string) => {
-    closeAll();
-    router.push(roomHref(h));
-  };
-
   const projectItems = projects.map((p) => (
     <button key={p.slug} type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: "project", slug: p.slug })}>
       {p.title}
-    </button>
-  ));
-  const roomItems = rooms.map((r) => (
-    <button key={r.handle} type="button" className={`text-left hover:opacity-50 ${r.handle === room.handle ? "underline underline-offset-4" : ""}`} onClick={() => go(r.handle)}>
-      {r.title}
     </button>
   ));
   const links = linkItems().map(([label, href]) => (
@@ -375,20 +291,20 @@ export function Experience({ handle }: { handle: string }) {
   return (
     <>
       <Loader />
-      <RoomView room={room} dimmed={anyOpen} onAction={onAction} />
+      <Artwork dimmed={anyOpen} />
 
       {/* click-away layer */}
       {anyOpen && <button type="button" aria-label="Close" className="fixed inset-0 z-30 cursor-default" onClick={closeAll} />}
 
-      {/* Credit tag for artwork / photos */}
-      {room.credit && (
+      {/* Credit tag for the artwork */}
+      {home.credit && (
         <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7">
-          {room.credit.url ? (
-            <a href={room.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-              <CreditText c={room.credit} />
+          {home.credit.url ? (
+            <a href={home.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              <CreditText c={home.credit} />
             </a>
           ) : (
-            <CreditText c={room.credit} />
+            <CreditText c={home.credit} />
           )}
         </div>
       )}
@@ -413,9 +329,6 @@ export function Experience({ handle }: { handle: string }) {
           </button>
         </div>
         {/* desktop corners */}
-        <button type="button" className={`${btn} pointer-events-auto fixed bottom-6 left-6 hidden md:block`} aria-expanded={menu === "explore"} onClick={() => toggle("explore")}>
-          Explore
-        </button>
         <button type="button" className={`${btn} pointer-events-auto fixed bottom-6 right-6 hidden md:block`} aria-expanded={menu === "links"} aria-label="Links" onClick={() => toggle("links")}>
           ®
         </button>
@@ -434,29 +347,24 @@ export function Experience({ handle }: { handle: string }) {
         </div>
       </header>
 
-      {/* Left panel: projects / explore / mobile menu */}
+      {/* Left panel: projects / mobile menu */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Menu"
-        aria-hidden={!(menu === "projects" || menu === "explore" || menu === "mobile")}
+        aria-hidden={!(menu === "projects" || menu === "mobile")}
         className="fixed bottom-0 left-0 top-0 z-[45] w-[calc(100vw-120px)] max-w-[353px] text-white transition-all duration-500 ease-[cubic-bezier(.165,.84,.44,1)]"
         style={{
-          visibility: menu === "projects" || menu === "explore" || menu === "mobile" ? "visible" : "hidden",
-          transform: menu === "projects" || menu === "explore" || menu === "mobile" ? "none" : "translateX(-100%)",
+          visibility: menu === "projects" || menu === "mobile" ? "visible" : "hidden",
+          transform: menu === "projects" || menu === "mobile" ? "none" : "translateX(-100%)",
         }}
       >
         <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "projects" ? "" : "pointer-events-none opacity-0"}`}>
           <MenuList open={menu === "projects"} items={projectItems} />
         </div>
-        <div className={`absolute inset-0 flex items-end px-6 pb-20 ${menu === "explore" ? "" : "pointer-events-none opacity-0"}`}>
-          <MenuList open={menu === "explore"} items={roomItems} />
-        </div>
         <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "mobile" ? "" : "pointer-events-none opacity-0"}`}>
           <h3 className="mb-3 font-bold opacity-60">Projects</h3>
           <MenuList open={menu === "mobile"} items={projectItems} />
-          <h3 className="mb-3 mt-8 font-bold opacity-60">Explore</h3>
-          <MenuList open={menu === "mobile"} items={roomItems} />
           <h3 className="mb-3 mt-8 font-bold opacity-60">More</h3>
           <MenuList
             open={menu === "mobile"}

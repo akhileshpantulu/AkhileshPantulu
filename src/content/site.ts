@@ -1,8 +1,9 @@
 /**
  * All site content lives in this file. Edit it and the whole site updates.
  *
- * The site is a set of "rooms": full-screen scenes with beacons you click to
- * move between rooms or open a panel. Everything marked TODO is placeholder.
+ * The homepage is a single artwork shown full-screen, with menus that open
+ * side drawers for projects, about, and contact. Everything marked TODO is
+ * placeholder.
  */
 
 export const site = {
@@ -19,78 +20,18 @@ export const site = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Rooms                                                               */
-/*                                                                     */
-/* `scene` picks a built-in illustration (src/components/scenes.tsx).  */
-/* Set `image` to a 16:9 photo in /public to use your own picture      */
-/* instead, then move the beacons to match it.                         */
-/*                                                                     */
-/* Beacon x / y are percentages of the scene (0–100, from top-left).   */
-/* `side: "left"` makes the label open toward the left (use it for     */
-/* beacons near the right edge).                                       */
+/* Homepage artwork. The image lives in /public and is always shown   */
+/* whole (never cropped). The credit appears as a small tag below it.  */
 /* ------------------------------------------------------------------ */
 
+export type Credit = { title: string; artist: string; year: string; museum: string; url?: string };
+
+export const home: { image: string; credit: Credit | null } = {
+  image: "/Bradford.jpg",
+  credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" },
+};
+
 export type Panel = "about" | "contact";
-
-export type BeaconAction =
-  | { room: string } // go to another room
-  | { panel: Panel } // open a drawer
-  | { project: string } // open a project (by slug)
-  | { url: string }; // external link
-
-export type Beacon = {
-  x: number;
-  y: number;
-  label: string;
-  action: BeaconAction;
-  side?: "left" | "right";
-};
-
-export type Room = {
-  handle: string;
-  title: string;
-  scene: "front" | "studio" | "library";
-  image?: string;
-  // Optional credit tag shown at the bottom of the room (for artwork or photos).
-  credit?: { title: string; artist: string; year: string; museum: string; url?: string };
-  beacons: Beacon[];
-};
-
-export const rooms: Room[] = [
-  {
-    handle: "front",
-    title: "Front",
-    scene: "front",
-    // Homepage artwork (public/Bradford.jpg). Image rooms are shown whole,
-    // never cropped. If the file is missing, the house illustration shows instead.
-    image: "/Bradford.jpg",
-    credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" },
-    beacons: [],
-  },
-  {
-    handle: "studio",
-    title: "Studio",
-    scene: "studio",
-    beacons: [
-      { x: 34.1, y: 33.3, label: "Project One", action: { project: "project-one" } },
-      { x: 44.7, y: 33.3, label: "Project Two", action: { project: "project-two" } },
-      { x: 55.3, y: 33.3, label: "Project Three", action: { project: "project-three" } },
-      { x: 65.9, y: 33.3, label: "Project Four", action: { project: "project-four" }, side: "left" },
-      { x: 84.7, y: 53.3, label: "Back to Front", action: { room: "front" }, side: "left" },
-    ],
-  },
-  {
-    handle: "library",
-    title: "Library",
-    scene: "library",
-    beacons: [
-      { x: 38.1, y: 68.9, label: "About Me", action: { panel: "about" } },
-      { x: 14.4, y: 41.1, label: "Education", action: { panel: "about" } },
-      { x: 50, y: 30, label: "Enter Studio", action: { room: "studio" } },
-      { x: 84.7, y: 53.3, label: "Back to Front", action: { room: "front" }, side: "left" },
-    ],
-  },
-];
 
 /* ------------------------------------------------------------------ */
 /* Projects. Each opens in the side drawer and has a full write-up at  */

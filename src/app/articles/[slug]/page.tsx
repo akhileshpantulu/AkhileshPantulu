@@ -48,14 +48,10 @@ export default async function Article({ params }: { params: Promise<{ slug: stri
 
   return (
     <div className="min-h-screen bg-white text-black">
-      <header className="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-black bg-white px-6">
-        <Link href="/rooms/studio/" className="font-semibold hover:opacity-50">
-          ← Studio
-        </Link>
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 font-bold">
+      <header className="sticky top-0 z-10 flex h-[72px] items-center justify-center border-b border-black bg-white px-6">
+        <Link href="/" className="font-bold">
           {site.name}
         </Link>
-        <span />
       </header>
       <article className="mx-auto w-full max-w-2xl px-6 pb-24 pt-14 sm:pt-20">
         <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
