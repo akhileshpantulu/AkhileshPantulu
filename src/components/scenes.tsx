@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Room } from "@/content/site";
 
 const W = 1600;
@@ -430,10 +430,16 @@ function LibraryScene() {
 export function Scene({ room }: { room: Room }) {
   // Falls back to the built-in illustration if the image is missing.
   const [failed, setFailed] = useState(false);
+  const img = useRef<HTMLImageElement>(null);
+  // The image can fail before React hydrates, so onError alone can miss it.
+  useEffect(() => {
+    const el = img.current;
+    if (el && el.complete && el.naturalWidth === 0) setFailed(true);
+  }, []);
   if (room.image && !failed) {
     const alt = room.credit ? `${room.credit.title} by ${room.credit.artist}` : "";
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={room.image} alt={alt} onError={() => setFailed(true)} className="absolute inset-0 h-full w-full object-cover" />;
+    return <img ref={img} src={room.image} alt={alt} onError={() => setFailed(true)} className="absolute inset-0 h-full w-full object-cover" />;
   }
   switch (room.scene) {
     case "front":

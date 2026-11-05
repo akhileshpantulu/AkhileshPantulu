@@ -62,12 +62,12 @@ export const rooms: Room[] = [
     handle: "front",
     title: "Front",
     scene: "front",
-    beacons: [
-      { x: 30.6, y: 58.9, label: "Enter Studio", action: { room: "studio" } },
-      { x: 39.4, y: 35.6, label: "Enter Library", action: { room: "library" } },
-      { x: 68.8, y: 58.9, label: "Tech Stack", action: { panel: "stack" }, side: "left" },
-      { x: 86.1, y: 63.9, label: "Get in Touch", action: { panel: "contact" }, side: "left" },
-    ],
+    // Homepage artwork: upload it to public/home-artwork.jpg. Until it's there,
+    // the built-in house illustration shows instead.
+    image: "/home-artwork.jpg",
+    // TODO: fill in the artwork credit, e.g.
+    // credit: { title: "", artist: "", year: "", museum: "The Museum of Modern Art, New York" },
+    beacons: [],
   },
   {
     handle: "studio",
