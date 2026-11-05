@@ -35,6 +35,12 @@ export const home: { image: string; credit: Credit | null } = {
    put the image in /public and add an entry with its credit. */
 export const gallery: { image: string; credit: Credit | null }[] = [
   { image: "/Bradford.jpg", credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" } },
+  { image: "/basquiat-bird-on-money.avif", credit: { title: "Bird on Money", artist: "Jean-Michel Basquiat", year: "1981", museum: "Rubell Family Collection" } },
+  { image: "/cole-the-oxbow.jpg", credit: { title: "The Oxbow", artist: "Thomas Cole", year: "1836", museum: "The Metropolitan Museum of Art" } },
+  { image: "/david-death-of-socrates.jpg", credit: { title: "The Death of Socrates", artist: "Jacques-Louis David", year: "1787", museum: "The Metropolitan Museum of Art" } },
+  { image: "/picasso-guernica.webp", credit: { title: "Guernica", artist: "Pablo Picasso", year: "1937", museum: "Museo Reina Sofía" } },
+  { image: "/pollock-number-14.jpg", credit: { title: "Number 14", artist: "Jackson Pollock", year: "1951", museum: "Tate" } },
+  { image: "/lawrence-migration-series-1.jpg", credit: { title: "The Migration Series, Panel 1", artist: "Jacob Lawrence", year: "1941", museum: "The Phillips Collection" } },
 ];
 
 /* Artwork for the About and Books pages, shown full-screen with the text
