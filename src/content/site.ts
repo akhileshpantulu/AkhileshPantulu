@@ -31,7 +31,7 @@ export const home: { image: string; credit: Credit | null } = {
   credit: { title: "Jungle Jungle", artist: "Mark Bradford", year: "2021", museum: "MoMA" },
 };
 
-export type Panel = "about" | "contact";
+export type Panel = "about" | "books" | "misc";
 
 /* ------------------------------------------------------------------ */
 /* Projects. Each opens in the side drawer and has a full write-up at  */
@@ -124,6 +124,15 @@ export const about = {
   ],
 };
 
-export const contact = {
-  blurb: "Happy to connect about projects, ideas, or interesting problems in AI, ML, and analytics.",
-};
+/* Books: shown in About → Books. TODO: replace with your own. */
+export const books: { title: string; author: string; note?: string; url?: string }[] = [
+  { title: "Book Title One", author: "Author Name", note: "One line on why it stuck with you." },
+  { title: "Book Title Two", author: "Author Name", note: "One line on why it stuck with you." },
+  { title: "Book Title Three", author: "Author Name" },
+];
+
+/* Misc: shown in About → Misc. Anything else: interests, links, notes. TODO. */
+export const misc: { title: string; text: string; url?: string }[] = [
+  { title: "Something I'm into", text: "A sentence or two about it." },
+  { title: "Something I'm working on", text: "A sentence or two about it." },
+];

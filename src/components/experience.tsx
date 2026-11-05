@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { about, contact, home, projects, site, type Credit, type Panel } from "@/content/site";
+import { about, books, home, misc, projects, site, type Credit, type Panel } from "@/content/site";
 import { longDate } from "./format";
 
-type Menu = null | "projects" | "links" | "mobile";
+type Menu = null | "projects" | "about" | "contact" | "links" | "mobile";
 type Drawer = null | { kind: Panel } | { kind: "project"; slug: string };
 
 const DEFAULT_ASPECT = 16 / 9;
@@ -178,20 +178,45 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
       </div>
     );
   }
-  if (drawer.kind === "contact") {
+  if (drawer.kind === "books") {
     return (
-      <div className="flex flex-col gap-6">
-        <p className="leading-relaxed text-neutral-700">{contact.blurb}</p>
-        <ul className="flex flex-col gap-2 text-2xl font-bold">
-          {linkItems().map(([label, href]) => (
-            <li key={label}>
-              <a href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noopener noreferrer" className="hover:opacity-50">
-                {label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul className="flex flex-col divide-y divide-neutral-200 border-y border-neutral-200">
+        {books.map((bk) => (
+          <li key={bk.title} className="py-4">
+            <div className="text-lg font-bold leading-tight">
+              {bk.url ? (
+                <a href={bk.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-50">
+                  {bk.title}
+                </a>
+              ) : (
+                bk.title
+              )}
+            </div>
+            <div className="mt-0.5 text-sm text-neutral-500">{bk.author}</div>
+            {bk.note && <p className="mt-2 text-sm leading-relaxed text-neutral-700">{bk.note}</p>}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  if (drawer.kind === "misc") {
+    return (
+      <ul className="flex flex-col gap-6">
+        {misc.map((m) => (
+          <li key={m.title}>
+            <div className="text-lg font-bold leading-tight">
+              {m.url ? (
+                <a href={m.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-50">
+                  {m.title}
+                </a>
+              ) : (
+                m.title
+              )}
+            </div>
+            <p className="mt-1 leading-relaxed text-neutral-700">{m.text}</p>
+          </li>
+        ))}
+      </ul>
     );
   }
   if (drawer.kind !== "project") return null;
@@ -234,13 +259,36 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
 }
 
 const drawerTitle = (d: Exclude<Drawer, null>) =>
-  d.kind === "about" ? "About" : d.kind === "contact" ? "Contact" : "Project";
+  d.kind === "about" ? "About" : d.kind === "books" ? "Books" : d.kind === "misc" ? "Misc" : "Project";
 
 function CreditText({ c }: { c: Credit }) {
   return (
     <>
       <span className="italic">{c.title}</span>, {c.artist}, {c.year} · {c.museum}
     </>
+  );
+}
+
+/** Small right-aligned list of contact links that fades in item by item. */
+function LinksList({ open, links, className, from }: { open: boolean; links: React.ReactNode[]; className: string; from: "above" | "below" }) {
+  return (
+    <div className={`fixed z-[45] text-white [text-shadow:0_0_12px_rgba(0,0,0,0.45)] ${className}`} style={{ visibility: open ? "visible" : "hidden" }} aria-hidden={!open}>
+      <ul className="flex flex-col items-end gap-1 px-2.5 text-base font-bold">
+        {links.map((node, i) => (
+          <li
+            key={i}
+            className="transition-[opacity,transform] duration-700 ease-in-out"
+            style={{
+              transitionDelay: open ? `${150 + i * 50}ms` : "0ms",
+              opacity: open ? 1 : 0,
+              transform: open ? "none" : `translateY(${from === "above" ? -6 : 6}px)`,
+            }}
+          >
+            {node}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -278,6 +326,11 @@ export function Experience() {
       {p.title}
     </button>
   ));
+  const aboutItems = (["about", "books", "misc"] as const).map((k) => (
+    <button key={k} type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: k })}>
+      {k === "about" ? "About" : k === "books" ? "Books" : "Misc"}
+    </button>
+  ));
   const links = linkItems().map(([label, href]) => (
     <a key={label} href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noopener noreferrer" className="hover:opacity-50">
       {label}
@@ -298,7 +351,7 @@ export function Experience() {
 
       {/* Credit tag for the artwork */}
       {home.credit && (
-        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7">
+        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 transition-opacity duration-300 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7" style={{ opacity: anyOpen ? 0 : 1, visibility: anyOpen ? "hidden" : "visible" }}>
           {home.credit.url ? (
             <a href={home.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
               <CreditText c={home.credit} />
@@ -317,14 +370,14 @@ export function Experience() {
             <button type="button" className={btn} aria-expanded={menu === "projects"} onClick={() => toggle("projects")}>
               Projects
             </button>
-            <button type="button" className={btn} onClick={() => openDrawer({ kind: "about" })}>
+            <button type="button" className={btn} aria-expanded={menu === "about"} onClick={() => toggle("about")}>
               About
             </button>
           </nav>
           <h1 className="absolute left-1/2 -translate-x-1/2 font-bold">
             <Link href="/">{site.name}</Link>
           </h1>
-          <button type="button" className={btn} onClick={() => openDrawer({ kind: "contact" })}>
+          <button type="button" className={btn} aria-expanded={menu === "contact"} onClick={() => toggle("contact")}>
             Contact
           </button>
         </div>
@@ -341,61 +394,43 @@ export function Experience() {
           <button type="button" className="h-8 border border-neutral-300 px-2 font-bold text-neutral-300" aria-expanded={menu === "mobile"} onClick={() => toggle("mobile")}>
             {menu === "mobile" ? "Close" : "Menu"}
           </button>
-          <button type="button" className="h-8 border border-neutral-300 px-2 font-bold text-neutral-300" onClick={() => openDrawer({ kind: "contact" })}>
-            Contact
+          <button type="button" className="h-8 border border-neutral-300 px-2 font-bold text-neutral-300" aria-expanded={menu === "links"} onClick={() => toggle("links")}>
+            {menu === "links" ? "Close" : "Contact"}
           </button>
         </div>
       </header>
 
-      {/* Left panel: projects / mobile menu */}
+      {/* Left panel: projects / about / mobile menu */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Menu"
-        aria-hidden={!(menu === "projects" || menu === "mobile")}
+        aria-hidden={!(menu === "projects" || menu === "about" || menu === "mobile")}
         className="fixed bottom-0 left-0 top-0 z-[45] w-[calc(100vw-120px)] max-w-[353px] text-white transition-all duration-500 ease-[cubic-bezier(.165,.84,.44,1)]"
         style={{
-          visibility: menu === "projects" || menu === "mobile" ? "visible" : "hidden",
-          transform: menu === "projects" || menu === "mobile" ? "none" : "translateX(-100%)",
+          visibility: menu === "projects" || menu === "about" || menu === "mobile" ? "visible" : "hidden",
+          transform: menu === "projects" || menu === "about" || menu === "mobile" ? "none" : "translateX(-100%)",
         }}
       >
         <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "projects" ? "" : "pointer-events-none opacity-0"}`}>
           <MenuList open={menu === "projects"} items={projectItems} />
         </div>
+        <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "about" ? "" : "pointer-events-none opacity-0"}`}>
+          <MenuList open={menu === "about"} items={aboutItems} />
+        </div>
         <div className={`scrollbar-hidden absolute inset-0 overflow-y-auto px-6 pb-24 pt-28 ${menu === "mobile" ? "" : "pointer-events-none opacity-0"}`}>
           <h3 className="mb-3 font-bold opacity-60">Projects</h3>
           <MenuList open={menu === "mobile"} items={projectItems} />
-          <h3 className="mb-3 mt-8 font-bold opacity-60">More</h3>
-          <MenuList
-            open={menu === "mobile"}
-            items={[
-              <button key="a" type="button" className="hover:opacity-50" onClick={() => openDrawer({ kind: "about" })}>
-                About
-              </button>,
-              ...links,
-            ]}
-          />
+          <h3 className="mb-3 mt-8 font-bold opacity-60">About</h3>
+          <MenuList open={menu === "mobile"} items={aboutItems} />
+          <h3 className="mb-3 mt-8 font-bold opacity-60">Contact</h3>
+          <MenuList open={menu === "mobile"} items={links} />
         </div>
       </div>
 
-      {/* Right corner panel: links */}
-      <div
-        className="fixed bottom-16 right-6 z-[45] hidden text-white transition-[visibility] md:block"
-        style={{ visibility: menu === "links" ? "visible" : "hidden" }}
-        aria-hidden={menu !== "links"}
-      >
-        <ul className="flex flex-col items-end gap-1 text-base font-bold">
-          {links.map((node, i) => (
-            <li
-              key={i}
-              className="transition-[opacity,transform] duration-700 ease-in-out"
-              style={{ transitionDelay: menu === "links" ? `${150 + i * 50}ms` : "0ms", opacity: menu === "links" ? 1 : 0, transform: menu === "links" ? "none" : "translateY(6px)" }}
-            >
-              {node}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Contact links: top-right dropdown (Contact) and bottom-right (® / phone Contact) */}
+      <LinksList open={menu === "contact"} links={links} className="right-6 top-[60px] hidden md:block" from="above" />
+      <LinksList open={menu === "links"} links={links} className="bottom-16 right-6" from="below" />
 
       {/* Right drawer */}
       <aside
