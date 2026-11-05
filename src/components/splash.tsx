@@ -21,7 +21,7 @@ export function Splash() {
     if (!seen) localStorage.setItem("splash-seen", String(Date.now()));
   } catch (e) {}
   // Add ?splash to the address to force it to play (handy for previewing).
-  if (/[?&]splash\b/.test(location.search)) seen = false;
+  try { if (new URLSearchParams(location.search).has("splash")) seen = false; } catch (e) {}
   if (seen) { el.remove(); return; }
   el.style.display = "flex";
   var name = ${JSON.stringify(site.name)};
