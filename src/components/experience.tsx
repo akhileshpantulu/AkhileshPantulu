@@ -465,6 +465,15 @@ export function Experience({ page }: { page?: Page }) {
       <Artwork key={art.image} dimmed={anyOpen} art={art} coverOnMobile={!!textPage && !textHidden} />
       {textPage && <TextPanel key={textPage} page={textPage} faded={anyOpen} hidden={textHidden} setHidden={setTextHidden} />}
 
+      {/* Gallery: on desktop each half of the screen is a click zone with an arrow cursor.
+          The header sits above it, so the cursor is normal over the menus. */}
+      {canFlip && !anyOpen && (
+        <div className="fixed inset-0 z-[38] hidden md:flex">
+          <button type="button" tabIndex={-1} aria-label="Previous piece" className="cursor-prev h-full w-1/2 outline-none" onClick={() => step(-1)} />
+          <button type="button" tabIndex={-1} aria-label="Next piece" className="cursor-next h-full w-1/2 outline-none" onClick={() => step(1)} />
+        </div>
+      )}
+
       {/* Gallery controls: corners on desktop, beside the credit on phones */}
       {canFlip && !anyOpen && (
         <>

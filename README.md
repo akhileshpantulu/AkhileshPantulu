@@ -16,7 +16,7 @@ npm run build      # writes the static site to ./out
 - **Homepage:** the artwork, always shown whole (never cropped) on any screen size, with its credit centered below.
 - **Header:** your name centered. Projects and About top-left each slide in a list from the left (About lists About / Books / Art / Misc). Contact top-right drops a short list of links. On phones it collapses to Menu and Contact buttons at the bottom.
 - **About and Books pages** (`/about`, `/books`): their own artwork, full-screen, with the text in a dark frosted panel down the full left side. Clicking outside it, pressing Escape, or "Hide" tucks it away to show the whole piece.
-- **Art page** (`/art`): a gallery shown one piece at a time like the homepage. Flip with Previous / Next, the arrow keys, or a swipe on phones.
+- **Art page** (`/art`): a gallery shown one piece at a time like the homepage. Click the left or right half of the screen (the cursor becomes an arrow), use Previous / Next or the arrow keys, or swipe on phones.
 - **Drawers:** each project and Misc slide in from the right.
 - **Articles:** every project has a full write-up at `/articles/<slug>`.
 
