@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { about, contact, projects, rooms, site, type Beacon as BeaconT, type Panel, type Room } from "@/content/site";
 import { Scene } from "./scenes";
-import { TechPhysics } from "./tech-physics";
 import { longDate } from "./format";
 
 type Menu = null | "projects" | "explore" | "links" | "mobile";
@@ -261,14 +260,6 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
       </div>
     );
   }
-  if (drawer.kind === "stack") {
-    return (
-      <div className="flex flex-col gap-4">
-        <p className="text-sm text-neutral-600">The tools I use most. Drag them around.</p>
-        <TechPhysics />
-      </div>
-    );
-  }
   if (drawer.kind !== "project") return null;
   const slug = (drawer as { slug: string }).slug;
   const p = projects.find((x) => x.slug === slug);
@@ -309,7 +300,7 @@ function DrawerBody({ drawer, openProject }: { drawer: Exclude<Drawer, null>; op
 }
 
 const drawerTitle = (d: Exclude<Drawer, null>) =>
-  d.kind === "about" ? "About" : d.kind === "contact" ? "Contact" : d.kind === "stack" ? "Tech Stack" : "Project";
+  d.kind === "about" ? "About" : d.kind === "contact" ? "Contact" : "Project";
 
 function CreditText({ c }: { c: NonNullable<Room["credit"]> }) {
   return (
@@ -410,9 +401,6 @@ export function Experience({ handle }: { handle: string }) {
             <button type="button" className={btn} aria-expanded={menu === "projects"} onClick={() => toggle("projects")}>
               Projects
             </button>
-            <button type="button" className={btn} onClick={() => openDrawer({ kind: "stack" })}>
-              Stack
-            </button>
             <button type="button" className={btn} onClick={() => openDrawer({ kind: "about" })}>
               About
             </button>
@@ -475,9 +463,6 @@ export function Experience({ handle }: { handle: string }) {
             items={[
               <button key="a" type="button" className="hover:opacity-50" onClick={() => openDrawer({ kind: "about" })}>
                 About
-              </button>,
-              <button key="s" type="button" className="hover:opacity-50" onClick={() => openDrawer({ kind: "stack" })}>
-                Tech Stack
               </button>,
               ...links,
             ]}

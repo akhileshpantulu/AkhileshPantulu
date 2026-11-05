@@ -30,7 +30,7 @@ export const site = {
 /* beacons near the right edge).                                       */
 /* ------------------------------------------------------------------ */
 
-export type Panel = "about" | "contact" | "stack";
+export type Panel = "about" | "contact";
 
 export type BeaconAction =
   | { room: string } // go to another room
@@ -76,7 +76,6 @@ export const rooms: Room[] = [
       { x: 44.7, y: 33.3, label: "Project Two", action: { project: "project-two" } },
       { x: 55.3, y: 33.3, label: "Project Three", action: { project: "project-three" } },
       { x: 65.9, y: 33.3, label: "Project Four", action: { project: "project-four" }, side: "left" },
-      { x: 50, y: 55.6, label: "Tech Stack", action: { panel: "stack" } },
       { x: 84.7, y: 53.3, label: "Back to Front", action: { room: "front" }, side: "left" },
     ],
   },
@@ -163,30 +162,6 @@ export const projects: Project[] = [
     stack: ["r", "sql"],
     body: [{ type: "p", text: "TODO: Write the article." }],
   },
-];
-
-/* ------------------------------------------------------------------ */
-/* Tech stack. Shown as draggable icons in the "Tech Stack" drawer.    */
-/* `icon` keys map to components in src/components/tech-icons.tsx.     */
-/* ------------------------------------------------------------------ */
-
-export const tech: { name: string; icon: string; color: string }[] = [
-  { name: "python", icon: "python", color: "#3776AB" },
-  { name: "sql", icon: "database", color: "#3f3f46" },
-  { name: "r", icon: "r", color: "#276DC3" },
-  { name: "pandas", icon: "pandas", color: "#E70488" },
-  { name: "scikit-learn", icon: "sklearn", color: "#F7931E" },
-  { name: "jupyter", icon: "jupyter", color: "#F37626" },
-  { name: "snowflake", icon: "snowflake", color: "#29B5E8" },
-  { name: "databricks", icon: "databricks", color: "#FF3621" },
-  { name: "postgres", icon: "postgres", color: "#4169E1" },
-  { name: "docker", icon: "docker", color: "#2496ED" },
-  { name: "excel", icon: "excel", color: "#21A366" },
-  { name: "power bi", icon: "bars", color: "#d4a800" },
-  { name: "typescript", icon: "typescript", color: "#3178C6" },
-  { name: "react", icon: "react", color: "#149eca" },
-  { name: "next.js", icon: "next", color: "#111111" },
-  { name: "claude", icon: "claude", color: "#D97757" },
 ];
 
 /* ------------------------------------------------------------------ */

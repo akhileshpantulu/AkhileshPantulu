@@ -14,8 +14,8 @@ npm run build      # writes the static site to ./out
 
 - **Loader:** a white screen with your name, shown once per browser session.
 - **Rooms:** `/` (Front), `/rooms/studio`, `/rooms/library`. Each scene blurs in on arrival. On phones the room is wider than the screen and can be swiped sideways.
-- **Header:** your name centered; Projects / Stack / About top-left, Contact top-right, Explore (room list) bottom-left, ® (links) bottom-right. On phones it collapses to Menu and Contact buttons at the bottom.
-- **Drawers:** About, Contact, Tech Stack (draggable icons), and each project slide in from the right.
+- **Header:** your name centered; Projects / About top-left, Contact top-right, Explore (room list) bottom-left, ® (links) bottom-right. On phones it collapses to Menu and Contact buttons at the bottom.
+- **Drawers:** About, Contact, and each project slide in from the right.
 - **Articles:** every project has a full write-up at `/articles/<slug>`.
 
 ## Edit content
@@ -27,13 +27,12 @@ Everything is in **`src/content/site.ts`**. Anything marked `TODO` is placeholde
 | Name, links, resume | `site` |
 | Rooms and their beacons | `rooms` |
 | Projects and write-ups | `projects` |
-| Tech stack icons | `tech` (icon keys map to `src/components/tech-icons.tsx`) |
 | About / contact text | `about`, `contact` |
 
 **Beacons:** each has `x` / `y` as percentages of the scene, a `label`, and an `action`:
 
 - `{ room: "studio" }`: go to another room
-- `{ panel: "about" | "contact" | "stack" }`: open a drawer
+- `{ panel: "about" | "contact" }`: open a drawer
 - `{ project: "project-one" }`: open a project
 - `{ url: "https://..." }`: external link
 
