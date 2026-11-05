@@ -427,19 +427,44 @@ function LibraryScene() {
   );
 }
 
-export function Scene({ room }: { room: Room }) {
+export function Scene({
+  room,
+  onImage,
+}: {
+  room: Room;
+  /** Reports the image's aspect ratio once loaded, or null if it failed. */
+  onImage?: (aspect: number | null) => void;
+}) {
   // Falls back to the built-in illustration if the image is missing.
   const [failed, setFailed] = useState(false);
   const img = useRef<HTMLImageElement>(null);
-  // The image can fail before React hydrates, so onError alone can miss it.
+  const fail = () => {
+    setFailed(true);
+    onImage?.(null);
+  };
+  const loaded = (el: HTMLImageElement) => onImage?.(el.naturalWidth / el.naturalHeight);
+  // The image can finish (or fail) before React hydrates, so the
+  // onLoad / onError handlers alone can miss it.
   useEffect(() => {
     const el = img.current;
-    if (el && el.complete && el.naturalWidth === 0) setFailed(true);
+    if (!el || !el.complete) return;
+    if (el.naturalWidth === 0) fail();
+    else loaded(el);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (room.image && !failed) {
     const alt = room.credit ? `${room.credit.title} by ${room.credit.artist}` : "";
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img ref={img} src={room.image} alt={alt} onError={() => setFailed(true)} className="absolute inset-0 h-full w-full object-cover" />;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        ref={img}
+        src={room.image}
+        alt={alt}
+        onLoad={(e) => loaded(e.currentTarget)}
+        onError={fail}
+        className="absolute inset-0 h-full w-full object-contain"
+      />
+    );
   }
   switch (room.scene) {
     case "front":

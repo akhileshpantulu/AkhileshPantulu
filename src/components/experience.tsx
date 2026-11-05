@@ -106,45 +106,78 @@ function BeaconButton({ b, onAction }: { b: BeaconT; onAction: (b: BeaconT) => v
 
 function RoomView({ room, dimmed, onAction }: { room: Room; dimmed: boolean; onAction: (b: BeaconT) => void }) {
   const wrap = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const [box, setBox] = useState<{ w: number; h: number; x: number; y: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
+  // Image rooms are shown whole ("contain"); illustrated rooms fill the screen ("cover").
+  const [imgAspect, setImgAspect] = useState<number | null>(null);
+  const [imgFailed, setImgFailed] = useState(false);
+  const contain = !!room.image && !imgFailed;
+  const aspect = contain ? (imgAspect ?? ASPECT) : ASPECT;
 
   useIsoLayoutEffect(() => {
     const fit = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const s = vw / vh > ASPECT ? { w: vw, h: vw / ASPECT } : { w: vh * ASPECT, h: vh };
-      setSize(s);
+      if (contain) {
+        // Leave room for the header above and the credit / corner buttons below.
+        const md = vw >= 768;
+        const short = !md && vh < 500; // phone held sideways
+        const top = md ? 72 : short ? 48 : 84;
+        const bottom = md ? 72 : short ? 64 : 128;
+        const side = md ? 24 : 16;
+        const aw = vw - side * 2;
+        const ah = Math.max(120, vh - top - bottom);
+        const w = Math.min(aw, ah * aspect);
+        const h = w / aspect;
+        setBox({ w, h, x: (vw - w) / 2, y: top + (ah - h) / 2 });
+      } else {
+        const s = vw / vh > aspect ? { w: vw, h: vw / aspect } : { w: vh * aspect, h: vh };
+        setBox({ ...s, x: 0, y: 0 });
+      }
     };
     fit();
     window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [room.handle, contain, aspect]);
+
+  useEffect(() => {
     const t = requestAnimationFrame(() => setRevealed(true));
-    return () => {
-      window.removeEventListener("resize", fit);
-      cancelAnimationFrame(t);
-    };
+    return () => cancelAnimationFrame(t);
   }, [room.handle]);
 
-  // Center the scene once its scaled size has rendered (matters on phones,
-  // where the room is wider than the screen and can be panned sideways).
+  // Cover mode on phones: the room is wider than the screen and can be
+  // panned sideways, so start centered.
   useIsoLayoutEffect(() => {
     const el = wrap.current;
-    if (!el || !size) return;
+    if (!el || !box || contain) return;
     el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
     el.scrollTop = (el.scrollHeight - el.clientHeight) / 2;
-  }, [size]);
+  }, [box, contain]);
 
   return (
     <div
       ref={wrap}
-      className="scrollbar-hidden fixed inset-0 overflow-auto bg-black"
+      className={`scrollbar-hidden fixed inset-0 bg-black ${contain ? "overflow-hidden" : "overflow-auto"}`}
       style={{
         filter: dimmed ? "blur(10px) brightness(0.55)" : revealed ? "blur(0px)" : "blur(25px)",
         transition: "filter 1s cubic-bezier(.165,.84,.44,1)",
       }}
     >
-      <div className="relative" style={size ? { width: size.w, height: size.h } : { width: "100vw", height: "100vh" }}>
-        <Scene room={room} />
+      <div
+        className="relative"
+        style={
+          box
+            ? { width: box.w, height: box.h, marginLeft: box.x, marginTop: box.y }
+            : { width: "100vw", height: "100vh", visibility: contain ? "hidden" : undefined }
+        }
+      >
+        <Scene
+          room={room}
+          onImage={(a) => {
+            if (a === null) setImgFailed(true);
+            else setImgAspect(a);
+          }}
+        />
         {room.beacons.map((b) => (
           <BeaconButton key={b.label + b.x} b={b} onAction={onAction} />
         ))}
@@ -359,7 +392,7 @@ export function Experience({ handle }: { handle: string }) {
 
       {/* Credit tag for artwork / photos */}
       {room.credit && (
-        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 w-max max-w-[calc(100vw-48px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7">
+        <div className="pointer-events-auto fixed bottom-[76px] left-1/2 z-40 [@media(max-height:500px)]:bottom-8 w-max max-w-[calc(100vw-48px)] [@media(max-height:500px)]:max-w-[calc(100vw-240px)] -translate-x-1/2 text-balance text-center leading-snug text-xs text-white/80 [text-shadow:0_0_8px_rgba(0,0,0,0.6)] md:bottom-7">
           {room.credit.url ? (
             <a href={room.credit.url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
               <CreditText c={room.credit} />
@@ -401,7 +434,7 @@ export function Experience({ handle }: { handle: string }) {
         </button>
 
         {/* mobile */}
-        <h1 className="pointer-events-auto fixed left-1/2 top-10 -translate-x-1/2 whitespace-nowrap font-bold md:hidden">
+        <h1 className="pointer-events-auto fixed left-1/2 top-10 -translate-x-1/2 whitespace-nowrap font-bold md:hidden [@media(max-height:500px)]:top-3">
           <Link href="/">{site.name}</Link>
         </h1>
         <div className="pointer-events-auto fixed inset-x-6 bottom-6 flex items-center justify-between md:hidden">

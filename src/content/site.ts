@@ -62,9 +62,9 @@ export const rooms: Room[] = [
     handle: "front",
     title: "Front",
     scene: "front",
-    // Homepage artwork: upload it to public/home-artwork.jpg. Until it's there,
-    // the built-in house illustration shows instead.
-    image: "/home-artwork.jpg",
+    // Homepage artwork (public/Bradford.jpg). Image rooms are shown whole,
+    // never cropped. If the file is missing, the house illustration shows instead.
+    image: "/Bradford.jpg",
     // TODO: fill in the artwork credit, e.g.
     // credit: { title: "", artist: "", year: "", museum: "The Museum of Modern Art, New York" },
     beacons: [],
