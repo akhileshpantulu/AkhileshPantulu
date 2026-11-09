@@ -411,12 +411,8 @@ export function Experience({ page }: { page?: Page }) {
     <Link key="about" href="/about/" onClick={closeAll} className={`hover:opacity-50 ${page === "about" ? "underline underline-offset-4" : ""}`}>
       About
     </Link>,
-    <Link key="books" href="/books/" onClick={closeAll} className={`hover:opacity-50 ${page === "books" ? "underline underline-offset-4" : ""}`}>
-      Books
-    </Link>,
-    <Link key="art" href="/art/" onClick={closeAll} className={`hover:opacity-50 ${page === "art" ? "underline underline-offset-4" : ""}`}>
-      Art
-    </Link>,
+    // Books (/books) and Art (/art) are switched off for now. To bring them back,
+    // restore their links here and their pages in src/app/books and src/app/art.
     <button key="misc" type="button" className="text-left hover:opacity-50" onClick={() => openDrawer({ kind: "misc" })}>
       Misc
     </button>,
