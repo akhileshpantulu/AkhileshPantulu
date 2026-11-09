@@ -14,8 +14,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* First-open splash (see src/components/splash.tsx). Hidden unless the
-   inline script turns it on, so repeat visits never flash white. */
+/* Opening splash (see src/components/splash.tsx). Hidden unless the
+   inline script turns it on, so pages that skip it never flash white. */
 #splash {
   position: fixed;
   inset: 0;
@@ -39,22 +39,12 @@ body {
   transform: scale(0.985);
 }
 .splash-line {
-  position: relative;
   display: inline-block;
   white-space: pre;
   transition:
     opacity 0.45s ease,
     filter 0.45s ease,
     transform 0.45s ease;
-}
-.splash-ghost {
-  visibility: hidden;
-}
-.splash-typed {
-  position: absolute;
-  left: 0;
-  top: 0;
-  white-space: pre;
 }
 
 .scrollbar-hidden {
