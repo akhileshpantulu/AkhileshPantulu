@@ -128,7 +128,7 @@ export const projects: Project[] = [
 
 export const about = {
   paragraphs: [
-    "Investment professional based in London. This website serves as a collection of my more esoteric interests, and AI application projects.",
+    "Investment professional based in London.",
   ],
 };
 
